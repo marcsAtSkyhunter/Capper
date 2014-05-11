@@ -4,8 +4,11 @@ Capper is a web application framework built on Node.js/Express (with Q.js for pr
 By using webkeys for access control, Capper makes it quick and easy to build applications for which people do not need usernames or passwords: they just bookmark the link to the object they have been granted access to, and to connect to the object they just click the link and go to work. As explained in the YouTube video at https://www.youtube.com/watch?v=C7Pt9PGs4C4 it can be reasonably argued that such webkey based access control is at least as secure as using passwords. Webkeys also make it easier to enable rich sharing wherein each participant in the handling of a resource gets as much authority as he needs and no more; see the youtube video on Rich Sharing at https://www.youtube.com/watch?v=T92ZboMsH1w to learn about key features of sharing that are common in the physical world but very rare on the web; the 2Click Sharing video at https://www.youtube.com/watch?v=cJThfgXMBA4 briefly shows a system entirely built with webkeys that enables such rich sharing on the web.
 
 Capper uses the same webkey protocol that the waterken platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
-####Capper Startup
-To get started, you will need to modify the capper.config file to suit your needs. To conduct client server testing on your development machine, you probably want to set "domain" to "localhost". Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
+####Capper First Steps
+If you are a mocha user, you may want to start out by running the included tests against the Capper backend to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
+>mocha --harmony
+
+Next, you will need to modify the capper.config file to suit your needs. To conduct client server testing on your development machine, you probably want to set "domain" to "localhost". Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
 
 In a command window, change directories to the Capper folder and startup the server from the command line with
 >node --harmony server
