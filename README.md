@@ -76,6 +76,6 @@ This version of the page will not even invoke our object to see what the greetin
 
 Please note the meta referrer=never tag in our page. You should always include this header when using webkeys. While the webkeys used by Capper, which place the credential in the fragment, are generally safe from being revealed via the referer header in most browsers, it is safer to explicitly request that the referer header be shut off.
 
-To actually invoke our object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting, we need to communicate with our resource using the Waterken protocol for webkey systems. A simple wrapper library for this protocol that allows us to make object invocations rather than fiddling ourselves with xhr requests can be found in CapperConnect.js, which is included in the distribution under Capper/views/libs
+To actually invoke our object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting, we need to communicate with our resource using the Waterken protocol for webkey systems. A simple wrapper library for this protocol that allows us to make object invocations rather than fiddling ourselves with xhr requests can be found in capperConnect.js, which is included in the distribution under Capper/views/libs
 
 
