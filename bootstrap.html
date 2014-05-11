@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title></title>
+</head>
+<body>
+<noscript>
+<p>This page requires a Javascript enabled web browser.</p>
+</noscript>
+<script type="text/javascript">
+var urlref = /([^#]*)#([^#]*)/.exec(window.location.href);
+if (urlref) {
+    var fragment = /(.*)&=/.exec(urlref[2]);
+    if (fragment) {
+        urlref[2] = fragment[1];
+    }
+    var url = urlref[1] + (/\?/.test(urlref[1]) ? '&' : '?') + urlref[2];
+    var http;
+    if (window.XMLHttpRequest) {
+        http = new XMLHttpRequest();
+    } else {
+        http = new ActiveXObject('MSXML2.XMLHTTP.3.0');
+    }
+    http.open('GET', url, true);
+    http.onreadystatechange = function () {
+        if (4 !== http.readyState) { return; }
+
+        window.document.write(http.responseText);
+        window.document.close();
+    };
+    http.send(null);
+}
+</script>
+</body>
+</html>

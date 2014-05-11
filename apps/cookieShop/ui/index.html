@@ -1,0 +1,23 @@
+<html>
+<head>
+<meta name="referrer" content="never">
+<title>Cookie Shop</title>
+<script type="text/javascript" src="/views/libs/q.js"></script>
+<script type="text/javascript" src="/views/libs/capperConnect.js"></script>
+<script type="text/javascript" src="/apps/cookieShop/ui/shop.js"></script>
+</head>
+<body>
+<h3>Cookie Shop </h3>
+<p>Cookies Sold: <span id="cookiesSold"></span></p>
+<p>
+<input type="button" value="Buy Cookies (with a Purse webkey)"
+    onclick="buyCookies()" />
+<input id="paypurse" />
+</p>
+<hr />
+<p><input type="button" value="Initialize Cash Register (with a Purse webkey)"
+    onclick="initCashRegister()" />
+<input id="register" />
+
+</body>
+</html>
