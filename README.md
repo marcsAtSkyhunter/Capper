@@ -27,7 +27,7 @@ This should print out a url that is a private unguessable url, it should look so
 
 The part after the "#s=" is the cryptographically strong and unguessable credential. This url refers to a new private Hello World page. Turn on the server again, go to this url, and you should see it. Bookmark the url if you want to go back to see it again later.
 
-You can destroy a service with the "drop" command using the credential. For the example service url above, you would destroy it with
+You can destroy a service with the "drop" command using the credential. For the example service url above, you would destroy it by shutting down the server and executing
 >node --harmony server -drop Vs6Q6ofuVL_DzzqoYe8cEuO
 
 ####Create Your Own HelloGalaxy Service
