@@ -71,7 +71,7 @@ which is the JSON format of the returned value sent to the client.
 Next lets create a very simple web page to display the new service in the browser. In Capper/apps/HelloGalaxy/ui/index.html, put the following web page:
 ```html
 <html><head>
-<meta referrer="never" />
+<meta name="referrer" content="never">
 <title>Hello Galaxy</title>
 </head>
 <body><h2>Howdy</h2></body>
@@ -80,11 +80,13 @@ Next lets create a very simple web page to display the new service in the browse
 
 This version of the page will not even invoke our object to see what the greeting should really be, but it should be good enough to give us a simple display. Click the webkey in your browser, and confirm you now get a page representing our HelloGalaxy object.
 
-Please note the meta referrer=never tag in our page. You should always include this header when using webkeys. While the webkeys used by Capper, which place the credential in the fragment, are generally safe from being revealed via the referer header in most browsers, it is safer to explicitly request that the referer header be shut off.
+Please note the meta/referrer/never tag in our page. You should always include this header when using webkeys. While the webkeys used by Capper, which place the credential in the fragment, are generally safe from being revealed via the referer header in most browsers, it is safer to explicitly request that the referer header be shut off.
 
-To actually invoke our object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting, we need to communicate with our resource using the Waterken protocol for webkey systems. A simple wrapper library for this protocol that allows us to make object invocations rather than fiddling ourselves with xhr requests can be found in capperConnect.js, which is included in the distribution under Capper/views/libs.
+####Using Client-Side CapperConnect to Invoke Server-Side Methods
 
-Upgrade the index.html file to import the Q promise package, CapperConnect, and a javascript file that contains the Hello Galaxy executable:
+To actually invoke our server-side object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting in our page, we need to communicate with our server from the browser. capperConnect.js is a simple wrapper library for webkey protocol that allows us to directly make remote object method invocations (rather than fiddling ourselves with xhr requests and protocol). capperConnect.js is included in the distribution under Capper/views/libs.
+
+To use CapperConnect, upgrade the index.html file to import the Q promise package, CapperConnect, and a javascript file that contains the Hello Galaxy executable:
 ```html
 <html>
 <head>
@@ -115,5 +117,27 @@ window.onload = showGreeting;
 ```
 After the window loads, the javascript will use CapperConnect to retrieve the actual greeting from our HelloGalaxy object on the server.
 
-CapperConnect.home is a client-side proxy for the server-side object being presented in the page. It has the method "post", which is given a method name ("greet" in this case) and a series of arguments as appropriate for the method invoked. Posting via the proxy returns a promise (from Q.js) for the answer; when the promise is fulfilled, it fires the "then" method that invokes the function with the answer (if something goes wrong, and the promise gets rejected, the second function fires with the error as the argument).  
+CapperConnect.home is a client-side proxy for the server-side object being presented in the page. It has the method "post", which is given a method name ("greet" in this case) and a series of arguments as appropriate for the method invoked. Posting via the proxy returns a promise (a Q.js promise) for the answer; when the promise is fulfilled, it fires the "then" method that invokes the function with the answer (if something goes wrong, and the promise gets rejected, the second function fires with the error as the argument).
+
+####Enable Initialization and Greeting Update
+As our last step in this quick introduction, we will enable HelloGalaxy services to be initialized with a greeting during construction, and further allow the greeting to be modified after creation.
+
+Let us enhance the HelloGalaxy service (in Capper/apps/HelloGalaxy/server/main.js, as you hopefully recall) with an initialization method and a setter method:
+
+```javascript
+module.exports = function HelloGalaxy(context) {
+    "use strict";
+    var self = {
+        init: function(initialGreeting) {
+            if (!("greeting" in context.state)) {self.setGreeting(initialGreeting);}
+        },
+        setGreeting: function(newGreeting) {context.state.greeting = newGreeting;},
+        greet: function() {return "Hello Galaxy";}
+    };
+    return Object.freeze(self);
+};
+```
+
+The "init" method is a special method used by Capper to deliver initialization arguments during the construction of a new persistent object. The context.state object contains persistent data that represents the state of this particular object: if the server is shut down, when the object is revived, context.state contains the earlier state. The system automatically checkpoints the context.state at the end of processing an incoming method invocation, just before returning the answer to the caller. We test at the beginning of the init function to see whether initialization has already taken place, to prevent accidental (or malicious) re-initialization of an already constructed object. In this case, we know the object has not yet been initialized if the "greeting" property in context.state does not yet exist. If we are initializing this object, we invoke our own setGreeting method with the initial greeting.
+
 
