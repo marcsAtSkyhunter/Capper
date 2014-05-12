@@ -9,6 +9,7 @@ Capper uses the same webkey protocol that the Waterken Java-based platform uses 
 ####Capper First Steps
 Install node.js, Express, and Q; Express and Q are conveniently installed with npm:
 >npm -g install express
+
 >npm -g install q
 
 Download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
