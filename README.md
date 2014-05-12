@@ -138,6 +138,27 @@ module.exports = function HelloGalaxy(context) {
 };
 ```
 
-The "init" method is a special method used by Capper to deliver initialization arguments during the construction of a new persistent object. The context.state object contains persistent data that represents the state of this particular object: if the server is shut down, when the object is revived, context.state contains the earlier state. The system automatically checkpoints the context.state at the end of processing an incoming method invocation, just before returning the answer to the caller. We test at the beginning of the init function to see whether initialization has already taken place, to prevent accidental (or malicious) re-initialization of an already constructed object. In this case, we know the object has not yet been initialized if the "greeting" property in context.state does not yet exist. If we are initializing this object, we invoke our own setGreeting method with the initial greeting.
+The "init" method is a special method used by Capper to deliver initialization arguments during the construction of a new persistent object. The context.state object contains persistent data that represents the state of this particular object: if the server is shut down, when the object is revived, context.state contains the earlier state. The system automatically checkpoints the context.state at the end of processing an incoming method invocation, just before returning the answer to the caller. Hence the object survives shutdown and restart just fine as long as the object's persistent data is stored in context.state.
 
+We test at the beginning of the init function to see whether initialization has already taken place, to prevent accidental (or malicious) re-initialization of an already constructed object. In this case, we know the object has not yet been initialized if the "greeting" property in context.state does not yet exist. If we are initializing this object, we invoke our own setGreeting method with the initial greeting.
 
+With this new code, our existing HelloGalaxy service will no longer work correctly: never having been initialized, it does not have a context.state.greeting to retrieve. Check it out: click the link in the browser, you should get something like Null for the greeting in the page. If we had many HelloGalaxy greeting services running, it would be easy enough to add an extra line of code to the JavaScript to upgrade each service when it was revived after a shutdown, but for this introduction, let us manually update our HelloGalaxy from the command line. Shut down the server and issue
+>node --harmony server -post @webkeyForHelloGalaxy setGreeting "Updated HelloGalaxy Greeting"
+
+Let's see the init method in action by creating another HelloGalaxy service:
+>node --harmony server -make helloGalaxy "Hello From a Place Far Far Away"
+
+The webkey returned by this command should show a service with an already-initialized greeting.
+
+As we come to the end of this introduction, we will not show all the code for an upgraded user interface (a larger index.html file with a field for a new greeting, and a button for posting it to the server, and a larger hello.js file to go with it), but let us look at the critical additional javascript function in the ui. The additional function on the browser side is setGreeting:
+
+```javascript
+function setGreeting(newGreeting) {
+    CapperConnect.home.post("setGreeting", newGreeting).then(function() {
+        showGreeting();
+    });
+}
+```
+Upon invoking the server side object with the setGreeting method, once we get confirmation that it has arrived, we call our existing showGreeting function to update the screen. 
+
+Another tutorial and an API document are on their way, but for now, welcome to Capper!
