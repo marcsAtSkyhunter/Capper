@@ -65,6 +65,7 @@ On this command line, the webkey is prefixed with "@" to indicate it should be i
 
 Invoking the object with -post should return a result similar to
 >{"=":"Hello Galaxy"}
+
 which is the JSON format of the returned value sent to the client.
 
 Next lets create a very simple web page to display the new service in the browser. In Capper/apps/HelloGalaxy/ui/index.html, put the following web page:
