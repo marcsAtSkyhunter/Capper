@@ -102,6 +102,22 @@ function showActor(req, res) {
 }
 app.get("/ocaps/", showActor);
 
+function vowAnsToVowJSONString(vowAns) {    
+    return vowAns.then(function(ans) {
+        try {
+            var ansId = saver.asId(ans);
+            var webkey = idToWebkey(ansId);
+            return JSON.stringify({"@": webkey});            
+        } catch (err) {
+            if (ans === undefined) {ans = null;}
+            var ansmap = {"=": ans};
+            return JSON.stringify(ansmap);            
+        }      
+   }, function(err){
+        return JSON.stringify({"!": err});
+   });
+}
+
 function invokeActor(req, res){
     log("post query " + JSON.stringify(req.query));
     log("post body: " + JSON.stringify(req.body));
@@ -115,24 +131,17 @@ function invokeActor(req, res){
     var translatedArgs = [objdata.id, objdata.method];
     args.forEach(function(next) {translatedArgs.push(webkeyToLive(next));});
     var vowAns = saver.deliver.apply(null, translatedArgs);
-    vowAns.then(function(ans) {
-        try {
-            var ansId = saver.asId(ans);
-            var webkey = idToWebkey(ansId);
-            res.send(JSON.stringify({"@": webkey}));            
-        } catch (err) {
-            if (ans === undefined) {ans = null;}
-            var ansmap = {"=": ans};
-            res.send(JSON.stringify(ansmap));            
-        }      
-   }, function(err){
-        res.send(JSON.stringify({"!": err}));
-   });
+    vowAnsToVowJSONString(vowAns).then(function(jsonString){
+        res.send(jsonString);
+    });
 }
 app.post("/ocaps/", parseBody, invokeActor);
 
+function wkeyStringToLive(keyString) {
+    return webkeyToLive({"@": keyString});
+}
 deferStart.promise.then(function(){
-    var argMap = caplib.argMap(process.argv);
+    var argMap = caplib.argMap(process.argv, wkeyStringToLive);
     if ("-drop" in argMap) {
         saver.drop(saver.credToId(argMap["-drop"][0]));
         saver.checkpoint().then(function() {console.log("drop done");});
@@ -142,6 +151,19 @@ deferStart.promise.then(function(){
         saver.checkpoint().then(function() {
             log(idToWebkey(saver.asId(obj)));
         });
+    } else if ("-post" in argMap) {
+        var args = argMap["-post"];
+        if (typeof args[0] !== "object") {
+            log("bad target object webkey; forget '@'?");
+        } else if (typeof args[1] !== "string") {
+            log("method to invoke is not a string");
+        } else {
+            args[0] = saver.asId(args[0]);
+            var vowAns = saver.deliver.apply(undefined, args);
+            vowAnsToVowJSONString(vowAns).then(function(answer){
+                log(answer);
+            });
+        }
     } else {
         var s = https.createServer(sslOptions, app);
         s.listen(port);    

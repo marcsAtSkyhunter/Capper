@@ -105,7 +105,7 @@ function cloneMap(m) {
  * Converts args preceded with "#" to numbers
  * Converts args preceded with "@" to live refs
  * */
-function argMap(argv, webkeyToLive) {
+function argMap(argv, webkeyStringToLive) {
     var args = {}; 
     var serverIndex;
     for (serverIndex  = 0; 
@@ -117,6 +117,8 @@ function argMap(argv, webkeyToLive) {
     commandArgs.forEach(function(next, i) {
         if (next.indexOf("#") === 0) {
             commandArgs[i] = parseFloat(next.substring(1));
+        } else if (next.indexOf("@") === 0) {
+            commandArgs[i] = webkeyStringToLive(next.substring(1));
         }
     });
     args[command] = commandArgs;
