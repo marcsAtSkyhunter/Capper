@@ -7,7 +7,11 @@ Webkeys also make it easier to enable _rich sharing_ wherein each participant in
 
 Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
 ####Capper First Steps
-First download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
+Install node.js, Express, and Q; Express and Q are conveniently installed with npm:
+>npm -g install express
+>npm -g install q
+
+Download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
 >mocha --harmony
 
 Next, you will need to modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost". Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
@@ -76,6 +80,38 @@ This version of the page will not even invoke our object to see what the greetin
 
 Please note the meta referrer=never tag in our page. You should always include this header when using webkeys. While the webkeys used by Capper, which place the credential in the fragment, are generally safe from being revealed via the referer header in most browsers, it is safer to explicitly request that the referer header be shut off.
 
-To actually invoke our object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting, we need to communicate with our resource using the Waterken protocol for webkey systems. A simple wrapper library for this protocol that allows us to make object invocations rather than fiddling ourselves with xhr requests can be found in capperConnect.js, which is included in the distribution under Capper/views/libs
+To actually invoke our object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting, we need to communicate with our resource using the Waterken protocol for webkey systems. A simple wrapper library for this protocol that allows us to make object invocations rather than fiddling ourselves with xhr requests can be found in capperConnect.js, which is included in the distribution under Capper/views/libs.
 
+Upgrade the index.html file to import the Q promise package, CapperConnect, and a javascript file that contains the Hello Galaxy executable:
+```html
+<html>
+<head>
+<meta name="referrer" content="never">
+<title>Hello Galaxy</title>
+<script type="text/javascript" src="/views/libs/q.js"></script>
+<script type="text/javascript" src="/views/libs/capperConnect.js"></script>
+<script type="text/javascript" src="/apps/helloGalaxy/ui/hello.js"></script>
+</head>
+<body>
+<h3 id="greeting"></h3>
+</body>
+</html>
+```
+Note that the h3 header that should contain the greeting now has an id, but no longer has an actual value inside. Our javascript will get the actual greeting from the server and put that into the header, using the id to find the place to insert it.
+
+Create the file apps/helloGalaxy/ui/hello.js and put in the following code:
+
+```javascript
+/*global document, CapperConnect, window */
+function showGreeting() {
+    "use strict";
+    CapperConnect.home.post("greet").then(function(ans){
+        document.getElementById("greeting").innerHTML += ans;
+    }, function(err){document.body.innerHTML += "got err: " + err;});
+}
+window.onload = showGreeting;
+```
+After the window loads, the javascript will use CapperConnect to retrieve the actual greeting from our HelloGalaxy object on the server.
+
+CapperConnect.home is a client-side proxy for the server-side object being presented in the page. It has the method "post", which is given a method name ("greet" in this case) and a series of arguments as appropriate for the method invoked. Posting via the proxy returns a promise (from Q.js) for the answer; when the promise is fulfilled, it fires the "then" method that invokes the function with the answer (if something goes wrong, and the promise gets rejected, the second function fires with the error as the argument).  
 
