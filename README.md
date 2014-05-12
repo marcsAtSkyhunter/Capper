@@ -110,7 +110,7 @@ Create the file apps/helloGalaxy/ui/hello.js and put in the following code:
 function showGreeting() {
     "use strict";
     CapperConnect.home.post("greet").then(function(ans){
-        document.getElementById("greeting").innerHTML += ans;
+        document.getElementById("greeting").innerHTML = ans;
     }, function(err){document.body.innerHTML += "got err: " + err;});
 }
 window.onload = showGreeting;
@@ -132,7 +132,7 @@ module.exports = function HelloGalaxy(context) {
             if (!("greeting" in context.state)) {self.setGreeting(initialGreeting);}
         },
         setGreeting: function(newGreeting) {context.state.greeting = newGreeting;},
-        greet: function() {return "Hello Galaxy";}
+        greet: function() {return context.state.greeting;}
     };
     return Object.freeze(self);
 };
@@ -142,7 +142,7 @@ The "init" method is a special method used by Capper to deliver initialization a
 
 We test at the beginning of the init function to see whether initialization has already taken place, to prevent accidental (or malicious) re-initialization of an already constructed object. In this case, we know the object has not yet been initialized if the "greeting" property in context.state does not yet exist. If we are initializing this object, we invoke our own setGreeting method with the initial greeting.
 
-With this new code, our existing HelloGalaxy service will no longer work correctly: never having been initialized, it does not have a context.state.greeting to retrieve. Check it out: click the link in the browser, you should get something like Null for the greeting in the page. If we had many HelloGalaxy greeting services running, it would be easy enough to add an extra line of code to the JavaScript to upgrade each service when it was revived after a shutdown, but for this introduction, let us manually update our HelloGalaxy from the command line. Shut down the server and issue
+With this new code, our existing HelloGalaxy service will no longer work correctly: never having been initialized, it does not have a context.state.greeting to retrieve. Check it out: click the link in the browser, you should get something like Null for the greeting in the page. If we had many HelloGalaxy greeting services running, it would be easy enough to add an extra line of code to upgrade each service when it was revived after a shutdown, but for this introduction, let us manually update our HelloGalaxy from the command line. Shut down the server and issue
 >node --harmony server -post @webkeyForHelloGalaxy setGreeting "Updated HelloGalaxy Greeting"
 
 Let's see the init method in action by creating another HelloGalaxy service:
