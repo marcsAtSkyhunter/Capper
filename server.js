@@ -118,17 +118,28 @@ function showActor(req, res) {
 }
 app.get("/ocaps/", showActor);
 
+function deepConvertToJSON(obj) {
+    if (obj === undefined) {return null;}
+    if (typeof obj === "function") {
+        log("bad function in deepConvertToJSON");
+        return null;
+    }
+    if (typeof obj !== "object") {return obj;}
+    if (saver.hasId(obj)) {
+        var webkey = idToWebkey(saver.asId(obj));
+        return {"@" : webkey};
+    }    
+    for (var key in obj) {
+        obj[key] = deepConvertToJSON(obj[key]);
+    }
+    return obj;
+}
 function vowAnsToVowJSONString(vowAns) {    
     return vowAns.then(function(ans) {
-        try {
-            var ansId = saver.asId(ans);
-            var webkey = idToWebkey(ansId);
-            return JSON.stringify({"@": webkey});            
-        } catch (err) {
-            if (ans === undefined) {ans = null;}
-            var ansmap = {"=": ans};
-            return JSON.stringify(ansmap);            
-        }      
+        ans = deepConvertToJSON(ans);
+        try { var iswkey = "@" in ans;
+            return JSON.stringify(ans);            
+        } catch(err) {return JSON.stringify({"=": ans});}     
    }, function(err){
         return JSON.stringify({"!": err});
    });

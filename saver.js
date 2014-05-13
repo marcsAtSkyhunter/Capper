@@ -14,21 +14,43 @@ Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
 */
 
-/*global require, Map, console, Proxy */
+/*global require, Map, console, Proxy, setImmediate */
 var fs = require("fs");
 var Q = require("q");
 var caplib = require("./caplib");
-function tos(x) {try{return JSON.stringify(x);} catch(e) {
-    var xs = "";
-    for (var k in x) {xs += k;}
-    return x + xs;
-}}
+
 module.exports = function(){
     "use strict";
     var dbfile = "capper.db";
     function log(text) {console.log(text);}
     
-    var make; var live;
+    var checkpoint; var make; var live;
+    /**
+     * Generally, a turn begins when a message is delivered from the server,
+     * and at the end of the turn, saver automatically initiates a checkpoint
+     * and gives the server a promise for the answer. The answer is fulfilled
+     * when the checkpoint is complete, and the server can then ship the answer
+     * back to the client.
+     * 
+     * However, if an app object internally uses mechanism like 
+     * setTimeout or NextTick or an internal promise to make something happen 
+     * later, the checkpointing system has no way of knowing about that new 
+     * turn that has been queued. 
+     * 
+     * For the moment, the solution is as follows: any time a persistent object
+     * changes its context.state, we look at the checkpointNeeded flag. If false,
+     * we set it to true and setImmediate a checkpointIfNeeded. The checkpoint
+     * function itself clears the flag. If state is changed during a normal
+     * method invocation turn, the checkpointIfNeeded will find the flag already
+     * cleared by the time its turn fires. If state is changed during a 
+     * timer event, the checkPointIfNeeded takes care of it.
+     *
+     * To allow the checkpointer to not checkpoint if no state changed,
+     * the make and drop operations must also set checkpointNeeded.
+     * */
+    var checkpointNeeded = false;
+    function checkpointIfNeeded() {if (checkpointNeeded){checkpoint();}}
+    
     function rawSend(webkey, method, args) {log("no send implemented");}
     function credToId(cred) {return Object.freeze({"@id": cred });    }
     function idToCred(id) {return id["@id"];}
@@ -46,24 +68,25 @@ module.exports = function(){
         if (!fs.existsSync(dbfile)) {fs.writeFileSync(dbfile, "{}");}
         var jsonState = fs.readFileSync(dbfile, 'utf8');
         if (jsonState.length === 0) {jsonState = "{}";}
-        console.log("json reloaded, size: " + jsonState.length);
         sysState = JSON.parse(jsonState);
 	}
 	loadSysState();
-    function checkpoint() {
+    checkpoint = function() {
         var vowPair = Q.defer();
-	    var jsonState = JSON.stringify(sysState);
-        fs.writeFile(dbfile, jsonState, function (err) {
-            if (err) {
-                console.log("checkpoint failed: " + err); 
-                vowPair.reject(err);                
-            } else {
-                console.log("checkpointed");
-                vowPair.resolve(true);
-            }
-        });
+        if (!checkpointNeeded) {
+            vowPair.resolve(true);
+        } else {
+            var jsonState = JSON.stringify(sysState);
+            checkpointNeeded = false;
+            fs.writeFile(dbfile, jsonState, function (err) {
+                if (err) {
+                    console.log("checkpoint failed: " + err); 
+                    vowPair.reject(err);                
+                } else {vowPair.resolve(true);}
+            });
+        }
         return vowPair.promise;
-	}
+	};
 	/*
 	 * livestate keys are the credentials.
 	 * each value is the reference to the corresponding object
@@ -77,6 +100,7 @@ module.exports = function(){
         if (liveToId.has(ref)){return liveToId.get(ref); }
         throw ("asId bad ref");
     }
+    function hasId(ref) {return liveToId.has(ref);}
 
     function validStateObj(obj) {
         if (obj === null) {return null;}
@@ -97,6 +121,7 @@ module.exports = function(){
         return obj;
     }
     function drop(id) {
+        checkpointNeeded = true;
         var cred = idToCred(id);
         liveToId.delete(liveState[cred]); 
         delete liveState[cred];
@@ -113,7 +138,11 @@ module.exports = function(){
                 } catch (e) {}
                 return ans;
             },
-            set: function(proxy, key, val) {                
+            set: function(proxy, key, val) {  
+                if (!checkpointNeeded) {
+                    checkpointNeeded = true;
+                    setImmediate(checkpointIfNeeded);
+                }
                 var typ = typeof(val);
                 if (typ === "function") {
                     throw "Function in context.state disallowed in " + constructorLocation;                    
@@ -166,6 +195,7 @@ module.exports = function(){
         return maker;
     }
 	make = function(makerLocation, optInitArgs) {
+        checkpointNeeded = true;
         var cred = caplib.unique();
         var newId = credToId(cred);
         sysState[cred] = {data: {}, reviver: makerLocation};
@@ -229,6 +259,7 @@ module.exports = function(){
 		deliver: deliver,
 		make: make,
         reviver: reviver,
+        hasId: hasId,
 		asId: asId,
         idToCred: idToCred,
         credToId: credToId,
