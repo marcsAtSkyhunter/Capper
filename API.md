@@ -1,4 +1,4 @@
-###Capper API
+###Not Ready For Review Draft: Capper API
 Capper has special objects for use by application services on both the server side and the client side. First, we discuss general principles of creating a new application.
 ####File Layout for a Capper Application
 A Capper service is actually a single persistent exportable object that has been assigned a webkey, so it can receive messages from outside the server. An application is a collection of such services that work together to deliver a solution to a client. 
