@@ -112,6 +112,35 @@ function cloneMap(m) {
     for (var key in m) {clone[key] = m[key];}
     return clone;
 }
+/**
+ * If the obj is a persistent object, or if the obj contains a persistent
+ * object, replace the object with a webkey object (i.e., {"@" : webkey}). If
+ * a function is encountered, convert to null and log it. In all other cases,
+ * leave it alone.
+ * 
+ * In the end, return the json string of the result.
+ * 
+ * TODO: the in-place replacement makes it possible for the persistent app
+ * that produced this array or map to see the webkeys of the live
+ * objects it included. Unnecessary loss of encapsulation.
+ * Do copy, not in-place replace.
+ * */
+function deepObjToJSON(obj, idToWebkey, saver) {
+    if (obj === undefined) {return null;}
+    if (typeof obj === "function") {
+        console.log("bad function in deepConvertToJSON");
+        return null;
+    }
+    if (typeof obj !== "object") {return obj;}
+    if (saver.hasId(obj)) {
+        var webkey = idToWebkey(saver.asId(obj));
+        return {"@" : webkey};
+    }    
+    for (var key in obj) {
+        obj[key] = deepObjToJSON(obj[key], idToWebkey, saver);
+    }
+    return obj;
+}
 
 /**
  * finding commands such and drop and make, if a command line has an arg 
@@ -148,7 +177,8 @@ var self = {
     tvalid: tvalid,
     makeSealerPair: makeSealerPair,
     cloneMap: cloneMap,
-    argMap:argMap
+    argMap:argMap,
+    deepObjToJSON: deepObjToJSON
 };
 return self;
 

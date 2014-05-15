@@ -42,7 +42,8 @@ module.exports = function(){
      * we set it to true and setImmediate a checkpointIfNeeded. The checkpoint
      * function itself clears the flag. If state is changed during a normal
      * method invocation turn, the checkpointIfNeeded will find the flag already
-     * cleared by the time its turn fires. If state is changed during a 
+     * cleared by the automatic checkpoint by the time its turn fires. If 
+     * state is changed during a 
      * timer event, the checkPointIfNeeded takes care of it.
      *
      * To allow the checkpointer to not checkpoint if no state changed,

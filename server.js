@@ -63,7 +63,6 @@ function reviverToUIPath(reviver) {
     revstring = revstring + parts[0] + "/ui/";
     var filename = parts.length > 1 ? parts[1] : "index";
     revstring += filename + ".html";
-    log("ui path: " + revstring)
     return revstring;
 }
 function getObj(req) {
@@ -79,15 +78,15 @@ function getObj(req) {
         method: req.query.q
     };
 }
-/*
-* webkeyToLive(wkeyObj) looks to see if the arg is a webkeyObject, if so, returns a live ref,
-* otherwise returns the arg unchanged
+/**
+* webkeyToLive(wkeyObj) looks to see if the arg is a webkeyObject, if so, 
+* returns a live ref, otherwise returns the arg unchanged
 */
 function webkeyToLive(wkeyObj) {
     try {
         if (wkeyObj["@"]) {
             var cred = wkeyObj["@"].split("#s=")[1];
-            log("wkeyObj is webkey, cred is " + cred);
+            //log("wkeyObj is webkey, cred is " + cred);
             return saver.live(saver.credToId(cred));
         } else {return wkeyObj;}
     } catch (err) {return wkeyObj;}
@@ -118,6 +117,7 @@ function showActor(req, res) {
 }
 app.get("/ocaps/", showActor);
 
+/*
 function deepConvertToJSON(obj) {
     if (obj === undefined) {return null;}
     if (typeof obj === "function") {
@@ -134,12 +134,14 @@ function deepConvertToJSON(obj) {
     }
     return obj;
 }
+*/
+
 function vowAnsToVowJSONString(vowAns) {    
     return vowAns.then(function(ans) {
-        ans = deepConvertToJSON(ans);
-        try { var iswkey = "@" in ans;
-            return JSON.stringify(ans);            
-        } catch(err) {return JSON.stringify({"=": ans});}     
+        var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
+        if (typeof result === "object" && ("@" in result)) {
+            return JSON.stringify(result);            
+        } else {return JSON.stringify({"=": result});}     
    }, function(err){
         return JSON.stringify({"!": err});
    });
