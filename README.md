@@ -150,7 +150,29 @@ Let's see the init method in action by creating another HelloGalaxy service:
 
 The webkey returned by this command should show a service with an already-initialized greeting.
 
-As we come to the end of this introduction, we will not show all the code for an upgraded user interface (a larger index.html file with a field for a new greeting, and a button for posting it to the server, and a larger hello.js file to go with it), but let us look at the critical additional javascript function in the ui. The additional function on the browser side is setGreeting:
+####Mocha Testing HelloGalaxy
+
+The back end of the Capper server is "saver.js", which manages the objects and their persistence. You can run mocha tests of your objects by directly using the interface to the saver. To create a simple test of our simple helloGalaxy object, go into Capper/test and create the helloGalaxy.js file. The test code looks like:
+
+```javascript
+/*global require describe it console */
+var assert = require("assert");
+var saver = require("../saver");
+describe ("hello galaxy", function() {
+    "use strict";
+    it("Set and Get Greeting ", function() {        
+        var hello = saver.make("helloGalaxy");
+        hello.setGreeting("TestHello");
+        assert(hello.greet() === "TestHello", 
+            "Set Greeting matches Retrieved Greeting");
+        saver.drop(saver.asId(hello));
+    });
+});
+```
+Our test creates a new helloGalaxy service with saver.make, sets the greeting, and asserts that the greeting retrieved from the service is in fact the greeting that we set. At the end of the testing, we drop the service to avoid having it become a permanent part of our database. The saver.drop method requires the internal persistent id of the object, not a live reference to the object, so we retrieve that with saver.asId(object).
+
+####Setting Greeting from the Browser
+As we come to the end of this introduction, we will not show all the code for an upgraded user interface (a larger index.html file with a field for creating a new greeting, and a SetGreeting button for posting it to the server, and a larger hello.js file to go with it), but let us look at the critical additional javascript function in the ui. The additional function on the browser side is setGreeting:
 
 ```javascript
 function setGreeting(newGreeting) {
