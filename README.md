@@ -169,6 +169,9 @@ describe ("hello galaxy", function() {
     });
 });
 ```
+Run the test by going into the main Capper directory and running mocha:
+>mocha --harmony
+
 Our test creates a new helloGalaxy service with saver.make, sets the greeting, and asserts that the greeting retrieved from the service is in fact the greeting that we set. At the end of the testing, we drop the service to avoid having it become a permanent part of our database. The saver.drop method requires the internal persistent id of the object, not a live reference to the object, so we retrieve that with saver.asId(object).
 
 ####Setting Greeting from the Browser
