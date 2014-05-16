@@ -25,6 +25,7 @@ module.exports = function(){
     function log(text) {console.log(text);}
     
     var checkpoint; var make; var live;
+    
     /**
      * Generally, a turn begins when a message is delivered from the server,
      * and at the end of the turn, saver automatically initiates a checkpoint
@@ -48,22 +49,32 @@ module.exports = function(){
      *
      * To allow the checkpointer to not checkpoint if no state changed,
      * the make and drop operations must also set checkpointNeeded.
-     * */
+    **/
+    var lastCheckpointCompleted = new Q(true);
     var checkpointNeeded = false;
-    function checkpointIfNeeded() {if (checkpointNeeded){checkpoint();}}
+    function checkpointIfNeeded() {
+        if (checkpointNeeded){
+        checkpoint();}        
+    }
+    function setupCheckpoint() {
+        if (!checkpointNeeded) {
+            checkpointNeeded = true;
+            setImmediate(checkpointIfNeeded);
+        }        
+    }
     
     function rawSend(webkey, method, args) {log("no send implemented");}
     function credToId(cred) {return Object.freeze({"@id": cred });    }
     function idToCred(id) {return id["@id"];}
 	
-	/*
+	/**
 	 * systate keys are the credentials from the webkey, i.e., "ids".
 	 * each value is a map with
 	 *   data: the pure data for reviving the object
 	 *   reviver: an array of strings for finding the function to revive it
 	 *      array[0] is the path to the code to be loaded via require
 	 *      array[1] is the optional method to invoke
-	*/
+	**/
 	var sysState = {};	
 	function loadSysState(){
         if (!fs.existsSync(dbfile)) {fs.writeFileSync(dbfile, "{}");}
@@ -79,11 +90,17 @@ module.exports = function(){
         } else {
             var jsonState = JSON.stringify(sysState);
             checkpointNeeded = false;
-            fs.writeFile(dbfile, jsonState, function (err) {
-                if (err) {
-                    console.log("checkpoint failed: " + err); 
-                    vowPair.reject(err);                
-                } else {vowPair.resolve(true);}
+            //force sequentiality on multiple pending checkpoints
+            var last = lastCheckpointCompleted;
+            lastCheckpointCompleted = vowPair.promise;
+            last.then(function(ok) {            
+                fs.writeFile(dbfile, jsonState, function (err) {
+                    if (err) {
+                        console.log("checkpoint failed: " + err); 
+                        vowPair.reject(err);                
+                    } else {vowPair.resolve(true);}
+                    //log("db size after write: "+ fs.statSync("capper.db").size);
+                });
             });
         }
         return vowPair.promise;
@@ -122,7 +139,7 @@ module.exports = function(){
         return obj;
     }
     function drop(id) {
-        checkpointNeeded = true;
+        setupCheckpoint();
         var cred = idToCred(id);
         liveToId.delete(liveState[cred]); 
         delete liveState[cred];
@@ -140,10 +157,7 @@ module.exports = function(){
                 return ans;
             },
             set: function(proxy, key, val) {  
-                if (!checkpointNeeded) {
-                    checkpointNeeded = true;
-                    setImmediate(checkpointIfNeeded);
-                }
+                setupCheckpoint();
                 var typ = typeof(val);
                 if (typ === "function") {
                     throw "Function in context.state disallowed in " + constructorLocation;                    
@@ -196,7 +210,7 @@ module.exports = function(){
         return maker;
     }
 	make = function(makerLocation, optInitArgs) {
-        checkpointNeeded = true;
+        setupCheckpoint();
         var cred = caplib.unique();
         var newId = credToId(cred);
         sysState[cred] = {data: {}, reviver: makerLocation};

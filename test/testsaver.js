@@ -1,9 +1,10 @@
 /*global require describe it console */
-"use strict";
 var assert = require("assert");
 var saver = require("../saver");
 var fs = require("fs");
+var Q = require("q");
 describe ("saver", function() {
+    "use strict";
     it("shared object ", function() {        
         var shared = saver.make("shared");
         shared.state.x = "testdata";
@@ -32,16 +33,47 @@ describe ("saver", function() {
         saver.drop(shareId);
     });
     it("saver reloaded, test checkpointing", function(done){
-        var checkpointOriginalSize = fs.statSync("capper.db").size;
-        assert(checkpointOriginalSize > 2, "checkpoint exists");
-        var incr = saver.make("incr");
-        var incrId = saver.asId(incr);
-        var vowBadMethod = saver.deliver(incrId, "badmethod", []);
-        vowBadMethod.then(function() {done("badmethod not caught");},
+        var checkpointOriginalSize = -1;
+        var incr, incrId;
+        var deferOriginalSize = Q.defer();
+        //fs.stat.size seems shockingly unreliable, mysterious
+        function vowCapperFileSize() {
+            var deferSize = Q.defer();
+            function cycle() {
+                fs.stat("capper.db", function(err, stats){
+                    if (err) {deferSize.reject(err); return;}
+                    if (stats.size === 0) {
+                        console.log("fs.stats capper.db size zero");
+                        cycle();
+                    } else {deferSize.resolve(stats.size);}
+                });
+            }
+            cycle();
+            return deferSize.promise;
+        }
+        saver.checkpoint().then(function(ok){
+            var vowSize = vowCapperFileSize();
+            vowSize.then(function(size){
+                checkpointOriginalSize = size;
+                try {
+                    assert(checkpointOriginalSize >= 2, "checkpoint exists");                
+                } catch (err2) {done(err2);}
+                deferOriginalSize.resolve(vowSize);
+            });
+        });
+        var vowBadMethod = deferOriginalSize.promise.then(function(originalSize){
+            incr = saver.make("incr");
+            incrId = saver.asId(incr);
+            return saver.deliver(incrId, "badmethod", []);
+        });         
+        var vowDidBadMethod = vowBadMethod.then(function() {
+            done("badmethod not caught");},
             function(err){
                 if(err.indexOf("badmethod") < 0) {done("poor badmethod err");}
+                return true;
             });
-        var vowNewInc = saver.deliver(incrId, "incr", []);
+        var vowNewInc = vowDidBadMethod.then(function() {
+            return saver.deliver(incrId, "incr");});
         var vowDroppedIncrCheckpointed = vowNewInc.then(function(incVal){
             assert(incVal === 1, "increment incremented to 1");
             var checkpointWithIncrSize = fs.statSync("capper.db").size;
