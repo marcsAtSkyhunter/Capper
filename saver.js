@@ -50,7 +50,7 @@ module.exports = function(){
      * To allow the checkpointer to not checkpoint if no state changed,
      * the make and drop operations must also set checkpointNeeded.
     **/
-    var lastCheckpointCompleted = new Q(true);
+    var lastCheckpointQueued = new Q(true);
     var checkpointNeeded = false;
     function checkpointIfNeeded() {
         if (checkpointNeeded){
@@ -86,14 +86,15 @@ module.exports = function(){
     checkpoint = function() {
         var vowPair = Q.defer();
         if (!checkpointNeeded) {
-            vowPair.resolve(true);
+            vowPair.resolve(lastCheckpointQueued);
         } else {
-            var jsonState = JSON.stringify(sysState);
             checkpointNeeded = false;
             //force sequentiality on multiple pending checkpoints
-            var last = lastCheckpointCompleted;
-            lastCheckpointCompleted = vowPair.promise;
-            last.then(function(ok) {            
+            var last = lastCheckpointQueued;
+            lastCheckpointQueued = vowPair.promise;
+            last.then(function(ok) {
+                var jsonState = JSON.stringify(sysState);
+                checkpointNeeded = false; //yes, say it again on each turn
                 fs.writeFile(dbfile, jsonState, function (err) {
                     if (err) {
                         console.log("checkpoint failed: " + err); 
