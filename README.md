@@ -15,7 +15,7 @@ Install node.js, Express, and Q; Express and Q are conveniently installed with n
 Download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
 >mocha --harmony
 
-Next, you will need to modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost". Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
+Next, you will need to modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost"; it will certainly not work if you leave the domain unchanged. Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
 
 In a command window, change directories to the Capper folder and startup the server from the command line with
 >node --harmony server
@@ -24,6 +24,8 @@ Now in the browser go to page
 >https://localhost:1341/
 
 (replace "1341" with your port number) which should pop you to the Capper Home page; this page can be edited in the Capper/views/index.html file.
+
+Use a Chrome or Firefox browser for the following examples. To keep the example code short and easy to read, we have not put in the litany of switches needed to handle browser differences, and have not depended on an additional library (like JQuery) to hide the differences (though for a production system, you probably should choose a tool that hides the differences). Some of the examples may work with later versions of IE, but this is not guaranteed. 
 
 ####Create A New HelloWorld Service
 To create a private hello world page, accessible only by you, shut down the server and type the command
