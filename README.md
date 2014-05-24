@@ -7,10 +7,10 @@ Webkeys also make it easier to enable _rich sharing_ wherein each participant in
 
 Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
 ####Capper First Steps
-Install node.js, Express, and Q; Express and Q are conveniently installed with npm:
->npm -g install express
 
->npm -g install q
+Install [node.js](nodejs.org), then install the dependencies:
+
+> npm install
 
 Download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
 >mocha --harmony
