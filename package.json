@@ -1,0 +1,29 @@
+{
+  "name": "Capper",
+  "version": "0.0.0",
+  "description": "A web application server with built-in object capability security built on Node.js/Express",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha --harmony",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcsAtSkyhunter/Capper"
+  },
+  "author": "Marc Stiegler",
+  "license": "LGPL",
+  "bugs": {
+    "url": "https://github.com/marcsAtSkyhunter/Capper/issues"
+  },
+  "dependencies": {
+    "q": "~1.0.1",
+    "express": "~4.3.1"
+  },
+  "devDependencies": {
+    "mocha": "~1.19.0"
+  }
+}
