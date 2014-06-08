@@ -16,10 +16,18 @@ If you are a mocha user, you may want to run the included tests to make sure the
 
 >mocha --harmony
 
+or
+>npm test
+
+which will do the same thing.
+
 Next, you must modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost"; it will certainly not work if you leave the domain unchanged. Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes in your browser.
 
 In a command window, change directories to the Capper folder and startup the server from the command line with
 >node --harmony server
+
+or, if you find it is too easy to forget to include the harmony option
+>npm start
 
 Now in the browser go to page 
 >https://localhost:1341/
