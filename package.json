@@ -1,6 +1,6 @@
 {
   "name": "Capper",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A web application server with built-in object capability security built on Node.js/Express",
   "main": "server.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "mocha --harmony",
-    "start": "node server.js"
+    "start": "node --harmony server.js"
   },
   "repository": {
     "type": "git",
