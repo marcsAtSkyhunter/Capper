@@ -8,7 +8,7 @@ Webkeys also make it easier to enable _rich sharing_ wherein each participant in
 Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
 ####Capper First Steps
 
-Install [node.js](http://nodejs.org). Clone Capper to your machine, or download the Capper directory as a zip file and unpack it. Make Capper your current working directory, and install the dependencies:
+Install [node.js](http://nodejs.org). Clone Capper to your machine, or download the Capper directory as a zip file and unpack it. Make the Capper root directory your current working directory, and install the dependencies:
 
 > npm install
 
