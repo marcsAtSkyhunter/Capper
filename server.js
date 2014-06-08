@@ -112,6 +112,9 @@ function showActor(req, res) {
     } else {
         var objdata = getObj(req);
         if (!objdata.live) {res.send("no such object");}
+        //res.setHeader("Content-Security-Policy", "default-src: 'self'");
+        //log("set CSP header");
+        //res.writeHead(200)
         res.sendfile(reviverToUIPath(objdata.reviver));
     }
 }

@@ -1,0 +1,10 @@
+config domain https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/
+config domain https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/
+post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post body: []
+post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post body: []
+post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post body: []
+post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post body: []

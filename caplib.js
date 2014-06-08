@@ -14,11 +14,11 @@ Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
 */
 
-/*global console, require */
-
+/*global console, require, module */
 module.exports = function() {
 "use strict";
-
+var fs = require("fs");
+var path = require("path");
 var crypto = require("crypto");
 /**
  * Function typeCheck allows a quick, concise limited form of duck typing of the
@@ -170,6 +170,37 @@ function argMap(argv, webkeyStringToLive) {
     return args;
 }
 
+function copyFile(src, dest) {
+    var data = fs.readFileSync(src);
+    fs.writeFileSync(dest);    
+}
+function copyRecurse(src, dest) {
+  var exists = fs.existsSync(src);
+  var stats = exists && fs.statSync(src);
+  var isDirectory = exists && stats.isDirectory();
+  if (exists && isDirectory) {
+    fs.mkdirSync(dest);
+    fs.readdirSync(src).forEach(function(childItemName) {
+      copyRecurse(path.join(src, childItemName),
+                        path.join(dest, childItemName));
+    });
+  } else if (exists) {copyFile(src, dest);}
+}
+function makeNewServer() {
+    function copyIfAbsent(dest) {
+        var srcDir = path.dirname(module.filename);
+        if (!fs.existsSync(dest)) {
+            copyRecurse(path.join(srcDir, dest), dest);
+        }
+    }
+    copyIfAbsent("capper.db");
+    copyIfAbsent("capper.config");
+    copyIfAbsent("apps");
+    copyIfAbsent("test");
+    copyIfAbsent("views");
+    copyIfAbsent("ssl");
+}
+
 var self = {
     typeCheck: typeCheck,
     unique: unique,
@@ -178,7 +209,9 @@ var self = {
     makeSealerPair: makeSealerPair,
     cloneMap: cloneMap,
     argMap:argMap,
-    deepObjToJSON: deepObjToJSON
+    deepObjToJSON: deepObjToJSON,
+    makeNewServer: makeNewServer,
+    copyRecurse: copyRecurse
 };
 return self;
 
