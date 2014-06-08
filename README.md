@@ -8,14 +8,15 @@ Webkeys also make it easier to enable _rich sharing_ wherein each participant in
 Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
 ####Capper First Steps
 
-Install [node.js](nodejs.org), then install the dependencies:
+Install [node.js](http://nodejs.org). Clone Capper to your machine, or download the Capper directory as a zip file and unpack it. Make Capper your current working directory, and install the dependencies:
 
 > npm install
 
-Download the Capper directory as a zip file and unpack it. If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
+If you are a mocha user, you may want to run the included tests to make sure the installation worked properly. Capper requires the harmony JavaScript extensions, so go into the Capper directory and execute
+
 >mocha --harmony
 
-Next, you will need to modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost"; it will certainly not work if you leave the domain unchanged. Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
+Next, you must modify the capper.config file to suit your needs. To conduct client-server testing on your development machine, you probably want to set "domain" to "localhost"; it will certainly not work if you leave the domain unchanged. Select a port you can open on your machine (beware of firewalls blocking ports, you may have to configure the firewall as well). At this time you must use protocol https. The self-signed certificate embodied in the "ssl" folder will be adequate for simple testing, though you will have to click OK through the cert monolog boxes.
 
 In a command window, change directories to the Capper folder and startup the server from the command line with
 >node --harmony server
