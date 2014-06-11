@@ -22,4 +22,4 @@ Because of the nature of the fine grain access via the webkeys, Bob can only inc
 
 ####Layout of the Server-Side code
 
-In the PlusMinus system, the main.js file found in apps/plusMinus/server/main.js contains constructors for the 3 different kinds of objects used in the system: there is a constructor for the root, for the incrementer, and for the decrementer.
+In the PlusMinus system, the main.js file found in apps/plusMinus/server/main.js contains constructors for the 3 different kinds of objects used in the system: there are constructors for the root, the incrementer, and the decrementer.
