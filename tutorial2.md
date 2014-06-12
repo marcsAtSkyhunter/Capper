@@ -52,7 +52,7 @@ The makeRoot method is called under 2 circumstances. First it is called when a n
 
 and if this property does not exist, this is new construction, and we initialize by creating a counter (which is a "shared" data object), an incrementer, and a decrementer. 
 
-To make a new persistent object, we use the context.make function. If we are creating an object from an app that only has one kind of object, we give specify the app name as the first argument, followed by a list of initialization arguments. In the case of the shared object, there are no initialization arguments, so we simply invoke _context.make("shared")_.
+To make a new persistent object, we use the _context.make_ function. If we are creating an object from an app that only has one kind of object, we give specify the app name as the first argument, followed by a list of initialization arguments. In the case of the shared object, there are no initialization arguments, so we simply invoke _context.make("shared")_.
 
 Once we have a shared counter object, we initialize the count to zero with _mem.counter.state.count = 0_.
 
