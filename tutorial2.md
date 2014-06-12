@@ -20,7 +20,7 @@ The root holds the webkeys for both the incrementer and the decrementer, and als
 
 Because of the nature of the fine grain access via the webkeys, Bob can only increment, he can neither decrement nor see the current count. Carol can similarly only decrement.
 
-####Server-Side code
+####Server-Side Root Object Code
 
 In the PlusMinus system, the main.js file found in apps/plusMinus/server/main.js contains constructors for the 3 different kinds of objects used in the system: there are constructors for the root, the incrementer, and the decrementer. We want these 3 objects to share access to a persistent mutable counter object: the root reads this counter, the incrementer adds to the counter, the decrementer subtracts from the counter.
 
@@ -29,7 +29,6 @@ Here we implement the shared persistent mutable counter using a "shared" persist
 Let us look at the code for the root constructor:
 
 ```javascript
-
     function makeRoot(context) {
         var mem = context.state;
         if (!("incr" in mem)) {
@@ -49,7 +48,7 @@ Let us look at the code for the root constructor:
 The makeRoot method is called under 2 circumstances. First it is called when a new plusMinusRoot is being newly constructed and initialized. Later, if the server shuts down and is restarted, makeRoot is called to revive the object. In this second case, the object has already been initialized. We can distinguish whether the object is being revived or newly constructed by looking at the context.state object to see if it has any of the instance variables it should have; in this code we test 
 
 ```javascript
-> "incr" in mem      // mem is a shortcut for context.state
+    "incr" in mem      // mem is a shortcut for context.state
 ```
 
 and if this property does not exist, this is new construction, and we initialize by creating a counter (which is a "shared" data object), an incrementer, and a decrementer. 
@@ -61,4 +60,25 @@ Once we have a shared counter object, we initialize the count to zero with _mem.
 Next we create an incrementer. makePlus is another constructor in the same app, and the same file, as makeRoot. If we wish to use the constructor from an app that has multiple constructors, we give context.make the concatenation of the app name and the constructor name as the first argument, as in _context.make("plusMinus.makePlus", mem.counter)_; the second argument, mem.counter, is the shared object that contains the count.
 
 We create the decrementer the same way we create the incrementer. The incrementer, decrementer, and counter all must be stored in the root's persistent context.state.
+
+####Server Side Incrementer Code
+The makePlus constructor that makes an incrementer has one more Capper feature to introduce: the _init_ function. The code is:
+
+```javascript
+    function makePlus(context) {
+        var mem = context.state;
+        return Object.freeze({
+            init: function(sharedCounter) {
+                if (!mem.counter) {mem.counter = sharedCounter;}
+            },
+            increment: function() {++mem.counter.state.count;}
+        });
+    }
+```
+
+Remember from the discussion of the Root object that the incrementer must receive the "shared" counter object when it is constructed. Constructor arguments are not passed to the makePlus function itself along with the context; rather, the makePlus function still receives only its context object, and initialization arguments are passed to the "init" method (for reasons beyond the scope of this tutorial, we found passing the initialization arguments to be error prone when reviving the object, when those arguments would be undefined). Since the init method is public, and can be called multiple times either by accident or by malice, it must be guarded to ensure it is only used once. In makePlus, we check to see if we already have the counter in context.state before performing the initialization. If the counter does not yet exist, we initialize it.
+
+The second method in the incrementer -- the only method that an outside client can sensibly call -- simply updates the counter's count.
+
+####Client Side Root Code
 
