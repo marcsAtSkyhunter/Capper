@@ -20,6 +20,30 @@ The root holds the webkeys for both the incrementer and the decrementer, and als
 
 Because of the nature of the fine grain access via the webkeys, Bob can only increment, he can neither decrement nor see the current count. Carol can similarly only decrement.
 
-####Layout of the Server-Side code
+####Server-Side code
 
-In the PlusMinus system, the main.js file found in apps/plusMinus/server/main.js contains constructors for the 3 different kinds of objects used in the system: there are constructors for the root, the incrementer, and the decrementer.
+In the PlusMinus system, the main.js file found in apps/plusMinus/server/main.js contains constructors for the 3 different kinds of objects used in the system: there are constructors for the root, the incrementer, and the decrementer. We want these 3 objects to share access to a persistent mutable counter object: the root reads this counter, the incrementer adds to the counter, the decrementer subtracts from the counter.
+
+Here we implement the shared persistent mutable counter using a "shared" persistent data object. The "shared" object is a persistent app object just like any other, but it comes predefined with Capper in the apps/shared app folder. It has no methods (so it cannot be accessed remotely), but it does have the property "state" that exposes its own context.state object to any object that holds a reference to it.
+
+Let us look at the code for the root constructor:
+
+```javascript
+
+    function makeRoot(context) {
+        var mem = context.state;
+        if (!("incr" in mem)) {
+            mem.counter = context.make("shared");
+            mem.counter.state.count = 0;
+            mem.incr = context.make("plusMinus.makePlus", mem.counter);
+            mem.decr = context.make("plusMinus.makeMinus", mem.counter);
+        }
+        return Object.freeze({
+            incrementer: function() {return mem.incr;},
+            decrementer: function() {return mem.decr;},
+            count: function(){return mem.counter.state.count;}
+        });
+    }
+```
+
+
