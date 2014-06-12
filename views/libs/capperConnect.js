@@ -14,7 +14,27 @@ Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
 */
 
-/*global window, XMLHttpRequest, Q  */
+/*global window, XMLHttpRequest, setTimeout, Q  */
+
+/**
+ * Anonymous function to ensure that, if the user clicks a link to a different
+ * object distinguished from the current object only by the credential in
+ * the fragment, the window will reload; normally, a browser will not
+ * reload just because the fragment has changed.
+ * */
+(function () {
+    "use strict";
+    var originalFragment = window.location.hash;
+    var checker = function () {
+        if (originalFragment !== window.location.hash) {
+            window.location.reload();
+        } else {
+            setTimeout(checker, 500);
+        }
+    };
+    setTimeout(checker, 500);
+}());
+
 var CapperConnect = function() { 
     "use strict";
     function makeProxy(JSONkey) {
