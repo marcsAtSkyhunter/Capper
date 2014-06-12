@@ -46,4 +46,11 @@ Let us look at the code for the root constructor:
     }
 ```
 
+The makeRoot method is called under 2 circumstances. First it is called when a new plusMinusRoot is being newly constructed and initialized. Later, if the server shuts down and is restarted, makeRoot is called to revive the object. In this second case, the object has already been initialized. We can distinguish whether the object is being revived or newly constructed by looking at the context.state object to see if it has any of the instance variables it should have; in this code we test 
+
+> "incr" in mem
+
+and if this property does not exist, this is new construction, and we initialize by creating a counter (which is a "shared" data object), an incrementer, and a decrementer. 
+
+To make a new persistent object, we use the context.make function. If we are creating an object from an app that only has one kind of object, we give specify the app name as the first argument, followed by a list of initialization arguments. In the case of the shared object, there are no initialization arguments, so we simply invoke _context.make("shared")_.
 
