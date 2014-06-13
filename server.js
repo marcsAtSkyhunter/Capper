@@ -142,10 +142,11 @@ function deepConvertToJSON(obj) {
 function vowAnsToVowJSONString(vowAns) {    
     return vowAns.then(function(ans) {
         var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
-        if (typeof result === "object" && ("@" in result)) {
+        if (result !== null && typeof result === "object" && ("@" in result)) {
             return JSON.stringify(result);            
         } else {return JSON.stringify({"=": result});}     
    }, function(err){
+        log("vowAnsToVowJSONString err " + err);
         return JSON.stringify({"!": err});
    });
 }

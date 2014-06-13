@@ -127,6 +127,7 @@ function cloneMap(m) {
  * */
 function deepObjToJSON(obj, idToWebkey, saver) {
     if (obj === undefined) {return null;}
+    if (obj === null) {return null;}
     if (typeof obj === "function") {
         console.log("bad function in deepConvertToJSON");
         return null;
