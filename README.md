@@ -5,7 +5,7 @@ By using webkeys for access control, Capper makes it quick and easy to build app
 
 Webkeys also make it easier to enable [rich sharing](http://www.hpl.hp.com/techreports/2009/HPL-2009-169.pdf) wherein each participant in the handling of a resource gets as much authority as he needs and no more. See the [video on Rich Sharing](https://www.youtube.com/watch?v=T92ZboMsH1w) to learn about key features of sharing that are common in the physical world but very rare on the web. And the [2Click Sharing video](https://www.youtube.com/watch?v=cJThfgXMBA4) briefly shows a whole online desktop system entirely built with webkeys that enables such rich sharing.
 
-Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
+Capper uses the same webkey protocol that the [Waterken](http://waterken.sourceforge.net/) Java-based platform uses for browser/server communication. Since this protocol was scrutinized as part of a week long security review of the Waterken server, the protocol is more likely to be less vulnerable than most of the systems making security claims on the web.
 ####Capper First Steps
 
 Install [node.js](http://nodejs.org). Clone Capper to your machine, or download the Capper directory as a zip file and unpack it. Make the Capper root directory your current working directory, and install the dependencies:
