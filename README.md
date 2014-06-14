@@ -197,4 +197,4 @@ function setGreeting(newGreeting) {
 ```
 Upon invoking the server side object with the setGreeting method, once we get confirmation that it has arrived, we call our existing showGreeting function to update the screen. 
 
-A second [tutorial](tutorial2.md) and an [API document](API.md) are on their way, but for now, welcome to Capper!
+This concludes the introduction. You can continue with [Part 2 of the tutorial](tutorial2.md) as desired. An [API document](API.md) is on its way.
