@@ -1,11 +1,11 @@
 ###Capper
-Capper is a web application framework built on Node.js/Express (with Q.js for promises) that implements object capability security using unguessable urls (i.e., _webkeys_) for access control. Persistence of exportable objects (which behave like individual small services) is automated, and a webkey is associated with each such persistent exportable object at creation.
+Capper is a web application framework built on Node.js/[Express](https://github.com/visionmedia/express) (with [Q.js for promises](https://github.com/kriskowal/q)) that implements security using [webkeys](http://waterken.sourceforge.net/web-key/), i.e., unguessable, self-authorizing urls. Persistence of remotely-accessible objects is automated, and a webkey is associated with each such persistent exportable object at creation.
 
-By using webkeys for access control, Capper makes it quick and easy to build applications for which people do not need usernames or passwords: they just bookmark the link to the object, and to access the object they just click the link and go to work. As explained in the YouTube video at https://www.youtube.com/watch?v=C7Pt9PGs4C4, it can be reasonably argued that such webkey based access control is at least as secure as using passwords. 
+By using webkeys for access control, Capper makes it quick and easy to build applications for which people do not need usernames or passwords: they just bookmark the link to the object they are allowed to use, and to access the object they just click the link and go to work. As explained in the [YouTube video "Webkeys versus Passwords"](https://www.youtube.com/watch?v=C7Pt9PGs4C4), it can be reasonably argued that such webkey based access control is at least as secure as using passwords. 
 
-Webkeys also make it easier to enable _rich sharing_ wherein each participant in the handling of a resource gets as much authority as he needs and no more. See the video on Rich Sharing at https://www.youtube.com/watch?v=T92ZboMsH1w to learn about key features of sharing that are common in the physical world but very rare on the web. And the 2Click Sharing video at https://www.youtube.com/watch?v=cJThfgXMBA4 briefly shows a whole online desktop system entirely built with webkeys that enables such rich sharing.
+Webkeys also make it easier to enable [rich sharing](http://www.hpl.hp.com/techreports/2009/HPL-2009-169.pdf) wherein each participant in the handling of a resource gets as much authority as he needs and no more. See the [video on Rich Sharing](https://www.youtube.com/watch?v=T92ZboMsH1w) to learn about key features of sharing that are common in the physical world but very rare on the web. And the [2Click Sharing video](https://www.youtube.com/watch?v=cJThfgXMBA4) briefly shows a whole online desktop system entirely built with webkeys that enables such rich sharing.
 
-Capper uses the same webkey protocol that the Waterken Java-based platform uses for browser/server communication. You can read more about webkeys, their virtues and their implementation, at http://waterken.sourceforge.net/
+Capper uses the same webkey protocol that the [Waterken](http://waterken.sourceforge.net/) Java-based platform uses for browser/server communication. Since this protocol was scrutinized as part of a week long security review of the Waterken server, the protocol is more likely to be less vulnerable than most of the systems making security claims on the web.
 ####Capper First Steps
 
 Install [node.js](http://nodejs.org). Clone Capper to your machine, or download the Capper directory as a zip file and unpack it. Make the Capper root directory your current working directory, and install the dependencies:
@@ -197,4 +197,4 @@ function setGreeting(newGreeting) {
 ```
 Upon invoking the server side object with the setGreeting method, once we get confirmation that it has arrived, we call our existing showGreeting function to update the screen. 
 
-A second [tutorial](tutorial2.md) and an [API document](API.md) are on their way, but for now, welcome to Capper!
+This concludes the introduction. You can continue with [Part 2 of the tutorial](tutorial2.md) as desired. An [API document](API.md) is on its way.
