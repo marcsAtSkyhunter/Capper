@@ -1,10 +1,10 @@
 /*global document, CapperConnect, window, alert */
-"use strict";
 function elem(id){return document.getElementById(id);}
 function increment() {
+    "use strict";
     CapperConnect.home.post("increment").then(function() {
-        alert("made it")
        elem("status").innerHTML += "...counter incremented..."; 
     }, function(err){alert(err);});
 }
    
+window.onload = function() {elem("incr").onclick = increment;};

@@ -12,7 +12,7 @@ function makePoster() {
 				var ans = JSON.parse(xhr.responseText);
 				if ("=" in ans) {
 					callback(ans["="]);
-				} else {callback(ans)}
+				} else {callback(ans);}
             } else {alert("post failed status " + xhr.status);}
         };
         xhr.open("POST", target, true);
@@ -30,3 +30,4 @@ var poster = makePoster();
 function increment() {
     poster.post("incr", [], function(x) {alert("new value " + x);});
 }
+window.onload = document.getElementById("incr").onclick = increment;

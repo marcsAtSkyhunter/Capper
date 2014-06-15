@@ -58,7 +58,7 @@ module.exports = function PlusMinus() {
             init: function(sharedCounter) {
                 if (!mem.counter) {mem.counter = sharedCounter;}
             },
-            increment: function() {--mem.counter.state.count;}
+            decrement: function() {--mem.counter.state.count;}
         });
     }
 
