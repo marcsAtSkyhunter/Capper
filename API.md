@@ -17,4 +17,8 @@ server/main.js |  ui/index.html
 
 ####CapperConnect for Browser Communication
 
+####Installing HTTPS Certificates
+
+The files for the certificate are stored in [Capper/ssl](ssl). Generate a new cert, store the files in this directory, and Capper will automatically use it. 
+
 ####Command Line Operations
