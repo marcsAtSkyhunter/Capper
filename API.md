@@ -1,5 +1,7 @@
 ###Not Ready For Review Draft: Capper API
 Capper has special objects for use by application services on both the server side and the client side. First, we discuss general principles of creating a new application.
+
+
 ####File Layout for a Capper Application
 A Capper service is actually a single persistent exportable object that has been assigned a webkey, so it can receive messages from outside the server. An application is a collection of such services that work together to deliver a solution to a client. 
 
@@ -12,8 +14,13 @@ Capper/apps/myApp/ui/index.html
 
 If there is only one kind of exportable object in the app, the main function in main.js is the constructor for the object; if there is more than one kind of object, the main.js module exports an object with constructors for each of the objects. If there are multipe types of objects, each object has a separate html file in the ui folder. So if there were 2 types of objects with constructors makeAdder and makeSubtractor, there would be at least 2 files in the ui folder, makeAdder.html and makeSubtractor.html.
 
-####Context Object for Persistent Services
+####Context Object and method init(args...) for Persistent ServiceObjects
+Every exportable object receives, at construction time, a context object. Exportable objects are constructed under 2 circumstances: when the object is initially being created, and when the object is being revived. In both circumstances, the constructor receives a context object and no other arguments. If during initial creation the object needs to receive arguments, these arguments are passed to the object via the optional init(args...) method that is invoked immediately by Capper immediately after construction, before being returned to the entity that requested creation of the object. Since the init(...) method is public, the developer must put a guard in the method to ensure it executes no more than once.
 
+The context object has 3 properties:
+
+- __context.drop()__: drops this object from the persistence and export systems. If an object drops itself, it can no longer be accessed via webkey. It will be garbage collected the next time the server shuts down and restarts. If another object on the server is holding a direct temporary reference (not stored in context.state), it will continue to be able access the object until the server shuts down. Therefore, one may want to perform a drop() only as part of a revoke() operation in which the object changes its state so that it throws exceptions any time it is called.
+- __context.state__: This property holds persistent object state that needs to survive server shutdowns and restarts. The context.state object behaves like a standard JavaScript object: context.state.a = 3, for example, places the value 3 in the property "a". There are several restrictions on what can and cannot be stored in context.state. You _can_ store
 
 ####API for Saver.js for Testing Applications
 
