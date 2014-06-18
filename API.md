@@ -20,7 +20,13 @@ Every exportable object receives, at construction time, a context object. Export
 The context object has 3 properties:
 
 - __context.drop()__: drops this object from the persistence and export systems. If an object drops itself, it can no longer be accessed via webkey. It will be garbage collected the next time the server shuts down and restarts. If another object on the server is holding a direct temporary reference (not stored in context.state), it will continue to be able access the object until the server shuts down. Therefore, one may want to perform a drop() only as part of a revoke() operation in which the object changes its state so that it throws exceptions any time it is called.
-- __context.state__: This property holds persistent object state that needs to survive server shutdowns and restarts. The context.state object behaves like a standard JavaScript object: context.state.a = 3, for example, places the value 3 in the property "a". There are several restrictions on what can and cannot be stored in context.state. You _can_ store
+- __context.state__: This property holds persistent object state that needs to survive server shutdowns and restarts. The context.state object behaves like a standard JavaScript map: context.state.a = 3, for example, places the value 3 in the property "a". There are several restrictions on what can and cannot be stored in context.state. You _can_ store any basic data type, including strings, booleans, and numbers. You _can_ store references to exportable objects. You _cannot_ store functions. You _can_ store arrays and maps filled with basic data and exportable objects. You _cannot_ store non-exportable, none-persistent objects that include functions. When storing a map or an array, care must be exercised if you modify elements in the collection. The Capper persistence system cannot detect modification inside such collections and may not store them. So in order to modify the second element in an array, for example, you must not only modify the array, you must also store the array inside context.state again, as in this example:
+```javascript
+  context.state.theArray[1] = newvalue;
+  context.state.theArray = context.state.theArray;
+```
+- __context.make(objectSpec, args...)__: 
+
 
 ####API for Saver.js for Testing Applications
 
