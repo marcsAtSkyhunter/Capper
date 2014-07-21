@@ -142,20 +142,26 @@ module.exports = function(){
     function drop(id) {
         setupCheckpoint();
         var cred = idToCred(id);
-        liveToId.delete(liveState[cred]); 
+        if (liveState[cred]){liveToId.delete(liveState[cred]);} 
         delete liveState[cred];
         delete sysState[cred];         
     }
     function makePersister(data, constructorLocation) {
+        function convertForExport(thing) {
+            if (typeof thing !== "object") {return thing;}
+            if (thing === null || thing === undefined) {return thing;}
+            if (liveToId.get(thing)) {return thing;}
+            if (idToCred(thing)) {return live(thing);}
+            for (var next in thing) {
+                var replacement = convertForExport(thing[next]);
+                if (thing[next] !== replacement) {thing[next] = replacement;}
+            }
+            return thing;
+        }
         var p = Proxy.create({
             //TODO unwind gotten objects to replace ids with persistent objs
-            get: function(proxy, key){
-                var ans = data[key];
-                try { // if the val at key is an id for a persistent obj, return obj
-                    var obj = live(ans);
-                    ans = obj || ans;
-                } catch (e) {}
-                return ans;
+            get: function(proxy, key) {
+                return convertForExport(data[key]);
             },
             set: function(proxy, key, val) {  
                 setupCheckpoint();
@@ -164,14 +170,17 @@ module.exports = function(){
                     throw "Function in context.state disallowed in " + constructorLocation;                    
                 }
                 if (typ === "object") {
-                    if (val === null) {data[key] = null;}
-                    var obj = validStateObj(val);
-                    if (obj) {
-                        data[key] = obj;                    
+                    if (val === null) {
+                        data[key] = null;                        
                     } else {
-                        throw "NonPersistent Object in context.state.set disallowed in "+
-                            constructorLocation;
-                    }                    
+                        var obj = validStateObj(val);
+                        if (obj) {
+                            data[key] = obj;                    
+                        } else {
+                            throw "NonPersistent Object in context.state.set disallowed in "+
+                                constructorLocation + " badObj: " + val;
+                        }
+                    }
                 } else {data[key] = val;}
             },
             has: function(name) {return name in data;}
@@ -200,6 +209,10 @@ module.exports = function(){
 	function makeContext(id, constructorLocation) {
 		var newContext = {make: make, state: new State(id)};
 		newContext.drop = function() {drop(id);};
+        newContext.isPersistent = function(obj) {
+            var id = liveToId.get(obj);
+            return id !== undefined && id !== null;
+        };
 		return Object.freeze(newContext);
 	}
     
@@ -218,11 +231,11 @@ module.exports = function(){
 		var newContext = makeContext(newId);
         var maker = reviverToMaker(makerLocation); 
 		var obj = maker(newContext);
+        liveState[cred] = obj;
+        liveToId.set(obj, newId);
         var initArgs = [];
         for (var i = 1; i <arguments.length; i++) {initArgs.push(arguments[i]);}
         if ("init" in obj) {obj.init.apply(undefined, initArgs);}
-		liveState[cred] = obj;
-        liveToId.set(obj, newId);
 		return obj;
 	};
 	live = function(id) {

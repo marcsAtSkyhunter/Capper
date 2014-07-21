@@ -15,7 +15,7 @@ information regarding how to obtain the source code for this library.
 */
 
 /*global window, XMLHttpRequest, setTimeout, Q  */
-
+function log(text) {console.log(text);}
 /**
  * Anonymous function to ensure that, if the user clicks a link to a different
  * object distinguished from the current object only by the credential in
@@ -73,6 +73,7 @@ var CapperConnect = function() {
             xhr.open("POST", target, true);
             xhr.setRequestHeader("Content-Type","text/plain");
             var data =  JSON.stringify(args);
+            //log("capperconnect.post args: " + data)
             xhr.send(data);
             return vowPair.promise;
         }

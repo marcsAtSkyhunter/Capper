@@ -165,6 +165,7 @@ function invokeActor(req, res){
     args.forEach(function(next) {translatedArgs.push(webkeyToLive(next));});
     var vowAns = saver.deliver.apply(null, translatedArgs);
     vowAnsToVowJSONString(vowAns).then(function(jsonString){
+        log("returning: " + jsonString);
         res.send(jsonString);
     });
 }
