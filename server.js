@@ -110,38 +110,25 @@ function showActor(req, res) {
     if (!req.query.s ) {
         res.sendfile("./bootstrap.html");
     } else {
-        var objdata = getObj(req);
-        if (!objdata.live) {res.send("no such object");}
-        //res.setHeader("Content-Security-Policy", "default-src: 'self'");
-        //log("set CSP header");
-        //res.writeHead(200)
-        res.sendfile(reviverToUIPath(objdata.reviver));
+        try {
+            var objdata = getObj(req);
+            if (!objdata.live) {res.send("no such object");}
+            //res.setHeader("Content-Security-Policy", "default-src: 'self'");
+            //log("set CSP header");
+            //res.writeHead(200)
+            res.sendfile(reviverToUIPath(objdata.reviver));
+        } catch (err) {
+            res.send("Object not Found");
+            res.close();
+        }
     }
 }
 app.get("/ocaps/", showActor);
 
-/*
-function deepConvertToJSON(obj) {
-    if (obj === undefined) {return null;}
-    if (typeof obj === "function") {
-        log("bad function in deepConvertToJSON");
-        return null;
-    }
-    if (typeof obj !== "object") {return obj;}
-    if (saver.hasId(obj)) {
-        var webkey = idToWebkey(saver.asId(obj));
-        return {"@" : webkey};
-    }    
-    for (var key in obj) {
-        obj[key] = deepConvertToJSON(obj[key]);
-    }
-    return obj;
-}
-*/
-
 function vowAnsToVowJSONString(vowAns) {    
     return vowAns.then(function(ans) {
         var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
+        log(JSON.stringify(result))
         if (result !== null && typeof result === "object" && ("@" in result)) {
             return JSON.stringify(result);            
         } else {return JSON.stringify({"=": result});}     

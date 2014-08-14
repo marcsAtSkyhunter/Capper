@@ -16,9 +16,10 @@ describe ("liveKeyIdconversions", function() {
         var cred = saver.idToCred(incrId);
         var webkeyObjString = JSON.stringify(toJ(incr, idToWebkey, saver));
         assert((JSON.parse(webkeyObjString))["@"] === idToWebkey(incrId),
-            "persistent obj is @key entry");
+            "persistent obj is @key entry \n" + JSON.parse(webkeyObjString)["@"] +
+            "  \n" + idToWebkey(incrId));
         var deepTrouble = {a:1, b:"b", c:incr, d:[2,incr, true], 
-            e: {f: incr, g: 3}
+            e: {f: incr, g: 3, h: incrId}
         };
         var deepJSON = toJ(deepTrouble, idToWebkey, saver);
         var wkey = idToWebkey(incrId);
@@ -26,7 +27,8 @@ describe ("liveKeyIdconversions", function() {
         assert (deepJSON.c["@"] === wkey, "simple nested service");
         assert(deepJSON.d[2] === true && deepJSON.d[1]["@"] === wkey,
             "array in deepTrouble");
-        assert(deepJSON.e.f["@"] === wkey, "deepest key");
+        assert(deepJSON.e.f["@"] === wkey, "deepest ref converted to key");
+        assert(deepJSON.e.h["@"] === wkey, "id converted to key");
         saver.drop(incrId);
     });
     // var vowNewInc = saver.deliver(incrId, "incr", []);

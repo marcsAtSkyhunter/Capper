@@ -25,12 +25,13 @@ describe ("MemberPersonDelegation", function() {
         assert(person.data().Name === "alice", "root should have name alice");
         child.kill();
         try {
-            assert(child.data().Name !== "alice", "data from revoke should have failed");
+            assert(child.data().Name === "alice", "retrieve data from revoke should have failed");
             assert(false, "child should have been revoked");
-        } catch (e) {
-            assert(person.data().Street === "219 Silver", 
-                "root should still have street");
-        }
+        } catch (e) {}
+        assert(person.data().Street === "219 Silver", 
+            "root should still have street");
+        assert(person.delegates().length === 0, 
+            "parent should no longer have child in delegates list");
         var id = saver.asId(person);
         person.kill();        
         assert(saver.live(id) === null, "should have live person null");        

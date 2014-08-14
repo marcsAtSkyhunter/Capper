@@ -24,6 +24,8 @@ module.exports = function(){
     var dbfile = "capper.db";
     function log(text) {console.log(text);}
     
+    // modifiedObjs has a cred as key and null as value; it is a set
+    var modifiedObjs = {};
     var checkpoint; var make; var live;
     
     /**
@@ -68,7 +70,7 @@ module.exports = function(){
     function idToCred(id) {return id["@id"];}
 	
 	/**
-	 * systate keys are the credentials from the webkey, i.e., "ids".
+	 * systate keys are the credentials from the webkeys, i.e., from the "ids".
 	 * each value is a map with
 	 *   data: the pure data for reviving the object
 	 *   reviver: an array of strings for finding the function to revive it
@@ -83,8 +85,21 @@ module.exports = function(){
         sysState = JSON.parse(jsonState);
 	}
 	loadSysState();
+    var validStateObj;
     checkpoint = function() {
         var vowPair = Q.defer();
+        for (var next in modifiedObjs) {
+            try {    
+                checkpointNeeded = true;
+                var initState = sysState[next].data;
+                var state = validStateObj(initState);
+                if (!state) { 
+                    console.log("!!!ERROR bad function in checkpoint for object of type " + 
+                        sysState[next].revive);
+                }
+            }catch (err) {} //missing cred in modifiedObjs, probably dropped from the table 
+        }
+        modifiedObjs = {};
         if (!checkpointNeeded) {
             vowPair.resolve(lastCheckpointQueued);
         } else {
@@ -121,7 +136,7 @@ module.exports = function(){
     }
     function hasId(ref) {return liveToId.has(ref);}
 
-    function validStateObj(obj) {
+    validStateObj = function(obj) {
         if (obj === null) {return null;}
         var id = liveToId.get(obj);
         if (id) {return id; }
@@ -138,7 +153,7 @@ module.exports = function(){
             } 
         }
         return obj;
-    }
+    };
     function drop(id) {
         setupCheckpoint();
         var cred = idToCred(id);
@@ -146,7 +161,13 @@ module.exports = function(){
         delete liveState[cred];
         delete sysState[cred];         
     }
-    function makePersister(data, constructorLocation) {
+
+    function makePersister(id) {
+        var cred = idToCred(id);
+        var data = sysState[cred].data;
+        var constructorLocation = sysState[cred].reviver;
+        //does modify in place converting ids to live objs; impossible complications
+        // when making a copy, context.state.array[3] = 5 cannot update state
         function convertForExport(thing) {
             if (typeof thing !== "object") {return thing;}
             if (thing === null || thing === undefined) {return thing;}
@@ -161,10 +182,16 @@ module.exports = function(){
         var p = Proxy.create({
             //TODO unwind gotten objects to replace ids with persistent objs
             get: function(proxy, key) {
-                return convertForExport(data[key]);
+                var ans = convertForExport(data[key]);
+                if (ans && typeof ans === "object" && !hasId(ans)) {
+                    modifiedObjs[cred] = null;
+                }                
+                return ans;
             },
             set: function(proxy, key, val) {  
                 setupCheckpoint();
+                modifiedObjs[cred] = null;
+                data[key] = val;      
                 var typ = typeof(val);
                 if (typ === "function") {
                     throw "Function in context.state disallowed in " + constructorLocation;                    
@@ -181,7 +208,7 @@ module.exports = function(){
                                 constructorLocation + " badObj: " + val;
                         }
                     }
-                } else {data[key] = val;}
+                } else {data[key] = val;} 
             },
             has: function(name) {return name in data;}
             //delete, iterate, keys
@@ -189,9 +216,7 @@ module.exports = function(){
         return p;    
     }
     function State(id) {
-        var cred = idToCred(id);
-        var data = sysState[cred].data;
-        return makePersister(data, sysState[cred].reviver);
+        return makePersister(id);
     }
         
     /*
@@ -251,7 +276,8 @@ module.exports = function(){
         liveToId.set(obj, id);
 		return obj;
 	};
-    function reviver(id) {return sysState[idToCred(id)].reviver;}
+    function reviver(id) {return sysState[idToCred(id)].reviver;        
+    }
 	function deliver(id, method, optArgs) {
         var actualArgs = [];
         for (var i = 2; i < arguments.length; i++) {actualArgs.push(arguments[i]);}
@@ -265,9 +291,12 @@ module.exports = function(){
             });
         } catch (err) {
             checkpoint().then(function(ok){
-                var errMsg = "saver.deliver err on " + reviver(id) + 
-                    " method " + method + " " + err;
-                log(errMsg);
+                var errMsg = "saver.deliver err ";
+                try {
+                    errMsg = "saver.deliver err on " + reviver(id) + 
+                        " method " + method + " " + err;
+                    log(errMsg);
+                } catch (e2) {errMsg += "Target object service no longer exists";}
                 ansPair.reject(errMsg); 
             });
         }

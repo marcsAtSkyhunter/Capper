@@ -37,7 +37,21 @@ function log(text) {console.log(text);}
 
 var CapperConnect = function() { 
     "use strict";
-    function makeProxy(JSONkey) {
+    var makeProxy;
+    function deepProxyConvert(obj) {
+        if (!obj || typeof obj !== "object") {return obj;}
+        for (var key in obj) {
+            if (obj[key] && typeof (obj[key]) === "object" ) {
+                if (obj[key]["@"]) {
+                    obj[key] = makeProxy(obj[key]);                    
+                } else {
+                    obj[key] = deepProxyConvert(obj[key]);
+                }
+            }
+        }
+        return obj;
+    }
+    makeProxy = function(JSONkey) {
         //"use strict";
         var keyparts = JSONkey["@"].split("#s=");
         var cred = keyparts[1];
@@ -58,7 +72,7 @@ var CapperConnect = function() {
                     try {
                         var ans = JSON.parse(xhr.responseText);
                         if ("=" in ans) {
-                            vowPair.fulfill(ans["="]);
+                            vowPair.fulfill(deepProxyConvert(ans["="]));
                         } else if ("!" in ans) {
                             vowPair.reject(ans["!"]);		
                         }else if ("@" in ans){
@@ -82,7 +96,7 @@ var CapperConnect = function() {
             isProxy: true,
             post: post
         });
-    }
+    };
     function keyToProxy(keyString) {return makeProxy({"@": keyString});}
     var home = keyToProxy("" + window.location);
     return Object.freeze({

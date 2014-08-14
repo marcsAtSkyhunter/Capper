@@ -113,8 +113,9 @@ function cloneMap(m) {
     return clone;
 }
 /**
- * If the obj is a persistent object, or if the obj contains a persistent
- * object, replace the object with a webkey object (i.e., {"@" : webkey}). If
+ * If the obj is a persistent object, or if the obj contains a ref to a persistent
+ * object, or the id of a persistent obj ({"@id": cred}), replace the object with 
+ * a webkey object (i.e., {"@" : webkey}). If
  * a function is encountered, convert to null and log it. In all other cases,
  * leave it alone.
  * 
@@ -136,15 +137,17 @@ function deepObjToJSON(obj, idToWebkey, saver) {
     if (saver.hasId(obj)) {
         var webkey = idToWebkey(saver.asId(obj));
         return {"@" : webkey};
-    }    
+    }  
+    if (saver.live(obj)) {return {"@": idToWebkey(obj)};}
+    var clone = obj instanceof Array  ? [] : {};
     for (var key in obj) {
-        obj[key] = deepObjToJSON(obj[key], idToWebkey, saver);
+        clone[key] = deepObjToJSON(obj[key], idToWebkey, saver);
     }
-    return obj;
+    return clone;
 }
 
 /**
- * finding commands such and drop and make, if a command line has an arg 
+ * finding commands such as drop and make, if a command line has an arg 
  * after "server" make the rest of the args elements in map
  * Returns map with one entry, the first post=server element as key, 
  * following args as list

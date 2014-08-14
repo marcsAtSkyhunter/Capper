@@ -1,4 +1,4 @@
-/*global document, console, CapperConnect, window, alert */
+/*global document, console, CapperConnect, window, alert, makeDelegationMgr, $ */
 "use strict";
 function log(text) {console.log(text);}
 function elem(id){return document.getElementById(id);}
@@ -27,12 +27,14 @@ var cachedData;
 function show() {
     CapperConnect.home.post("data").then(function(data) {
         cachedData = data;
-        log(data)
         var ordering = ["Name", "PhoneNumber",
             "DateOfBirth", "Street", "City", "State", "ZipCode"];
         var dataDiv = makeDataTable(ordering, data);
         elem("fields").innerHTML = dataDiv;
-        elem("title").innerHTML = "Person"; 
+        elem("title").innerHTML = "Person";
+        var mgr = makeDelegationMgr();
+        log("mgr " + mgr);
+        $(document.body).append(mgr.div); 
     }, function(err){alert(err);});
 }
 function update() {

@@ -22,7 +22,6 @@ function makeRecord(recordSpec) {
     return record;
 }
 
-
 module.exports = function Members() {
     function makeDelegateMgr(context) {
         var mem = context.state;
@@ -73,7 +72,7 @@ module.exports = function Members() {
                         return true;
                     }
                 }
-                log("delegator.removeDelegate found no delegate to remove");
+                log("ERROR: delegator.removeDelegate found no delegate to remove");
                 return false;            
             },
             delegates: function() {return mem.delegates;}
@@ -83,6 +82,11 @@ module.exports = function Members() {
     function makeAdmin(context) {
         var mem = context.state;
         if (!("members" in mem)) {mem.members = [];}
+        if (mem.members[0] && !mem.members[0].data) {
+            log("!!!ERROR!!! members has bad objs, resetting");
+            log("!!! " + JSON.stringify(mem.members))
+            mem.members = [];
+        }
         var delMgr = mem.delegateMgr;
         var self = Object.freeze({
             init: function(parentOwner, isRoot, isReadOnly) {
@@ -92,12 +96,15 @@ module.exports = function Members() {
                 mem.delegateMgr = mgr;
                 delMgr = mgr;
             },
-            members: function() {return mem.members;},
+            members: function() {log("mem0:" + objStr(mem.members[0]));return mem.members;},
             addMember: function() {
                 if (delMgr.isReadOnly()) {throw "ReadOnly View";}
                 var newMember = context.make("members.makePerson");
-                mem.members.push(newMember);
-                mem.members = mem.members; //tell context that mem.members changed
+                var temp = mem.members;
+                temp.push(newMember);
+                log (temp)
+                mem.members = temp; //tell context that mem.members changed
+                log(mem.members)
                 return newMember;
             },
             removeMember: function(member) {
@@ -113,6 +120,7 @@ module.exports = function Members() {
                 throw ("Member not found");
             },
             isReadOnly: function() {return delMgr.isReadOnly();},
+            isRoot: function() {return delMgr.isRoot();},
             makeDelegate: function(purpose, isReadOnly) {
                 return delMgr.makeDelegate(purpose, isReadOnly, "members.makeAdmin");
             },
@@ -163,11 +171,12 @@ module.exports = function Members() {
             setData: function(newData) {
                 if (delMgr.isReadOnly()) {throw "Read Only Access";}
                 if (!delMgr.isRoot()) {return delMgr.parentOwner().setData(newData);}
-                for (var next in newData) {mem.data[next] = newData[next];}
+                for (var next in newData) {log("setdata " + next);mem.data[next] = newData[next];}
                 mem.data = mem.data;
                 return true;
             },
             isReadOnly: function() {return delMgr.isReadOnly();},
+            isRoot: function() {return delMgr.isRoot();},
             makeDelegate: function(purpose, isReadOnly) {
                 return delMgr.makeDelegate(purpose, isReadOnly, "members.makePerson");
             },
