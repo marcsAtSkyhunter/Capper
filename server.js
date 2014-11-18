@@ -119,7 +119,7 @@ function showActor(req, res) {
             res.sendfile(reviverToUIPath(objdata.reviver));
         } catch (err) {
             res.send("Object not Found");
-            res.close();
+            //res.close();
         }
     }
 }

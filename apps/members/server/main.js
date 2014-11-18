@@ -22,11 +22,51 @@ function makeRecord(recordSpec) {
     return record;
 }
 
+/**
+ * Mapper is a collection of functions to be used on a simple array and acts like 
+ * an EcmaScript6 Map. Mapper maps can use persistent objects as keys, 
+ * and can be stored in context.state.
+ * Performance is poor for large maps.
+ * */
+var mapper = {
+    make: function() {return [];},
+    find: function(map, key) {
+        for (var i in map) {if (map[i][0] === key) {return i;}}
+        return -1;
+    },
+    get: function(map, key) {
+        var index = mapper.find(map, key);
+        return index >= 0 ? map[index][1] : undefined;
+    },
+    put: function(map, key, val) {
+        mapper.del(map, key);
+        map.push([key, val]);        
+    },
+    // revget = reverse get: given a val, return the key
+    revget: function(map, val) {
+        for (var i in map) {
+            if (map[i][1] === val) {return map[i][0];}
+        }        
+    },
+    del: function(map, key) {
+        var index = mapper.find(map, key);
+        if (index >= 0) {
+            map.splice(index, 1);
+            return true;
+        } else {return false;}
+    },
+    has: function(map, key) {return mapper.find(map, key) >= 0;},
+    keys: function(map) {return map.map(function(next) {return next[0];});},
+    values: function(map) {return map.map(function(next) {return next[1];}); }
+    //forEach: function(map, fn) {map.forEach}
+};
+
 module.exports = function Members() {
     function makeDelegateMgr(context) {
         var mem = context.state;
         var delegator = {
             init: function(self, parentOwner, isRoot, isReadOnly) {
+                if (mem.delegates) {return;}
                 if (!context.isPersistent(self)){log("ERROR Delegator Nonpersistent Self");}
                 if (parentOwner && !context.isPersistent(parentOwner)){
                     log("ERROR Delegator Nonpersistent Owner");                    
@@ -46,13 +86,13 @@ module.exports = function Members() {
                 var newDelegate = context.make(maker, mem.self, false,  
                     mem.isReadOnly || isReadOnly);
                 mem.delegates.push([purpose, newDelegate]);
-                mem.delegates = mem.delegates;
+                //mem.delegates = mem.delegates;
                 return newDelegate;
             },
             kill: function(selfContext) {
-                var delCopy = mem.delegates.map(function(next){return next;});
+                var delCopy = mapper.values(mem.delegates);
                 delCopy.forEach(function(next, i) {
-                    next[1].kill();
+                    next.kill();
                 });
                 if (mem.parentOwner) {
                     var oldParent = mem.parentOwner;
@@ -75,18 +115,20 @@ module.exports = function Members() {
                 log("ERROR: delegator.removeDelegate found no delegate to remove");
                 return false;            
             },
+            /** delegates() returns list of pairs, pair[0]=purpose, pair[1]=delegates **/
             delegates: function() {return mem.delegates;}
         };
         return delegator;
     }
     function makeAdmin(context) {
         var mem = context.state;
-        if (!("members" in mem)) {mem.members = [];}
-        if (mem.members[0] && !mem.members[0].data) {
-            log("!!!ERROR!!! members has bad objs, resetting");
-            log("!!! " + JSON.stringify(mem.members))
-            mem.members = [];
-        }
+        //members map has key=member-delegate shown to client, value=member-root
+        if (!("members" in mem)) {mem.members = mapper.make();}
+        //if (mem.members[0] && !mem.members[0].data) {
+        //    log("!!!ERROR!!! members has bad objs, resetting");
+        //    log("!!! " + JSON.stringify(mem.members));
+        //    mem.members = [];
+        //}
         var delMgr = mem.delegateMgr;
         var self = Object.freeze({
             init: function(parentOwner, isRoot, isReadOnly) {
@@ -96,41 +138,64 @@ module.exports = function Members() {
                 mem.delegateMgr = mgr;
                 delMgr = mgr;
             },
-            members: function() {log("mem0:" + objStr(mem.members[0]));return mem.members;},
+            members: function() {return mapper.keys(mem.members);},
             addMember: function() {
                 if (delMgr.isReadOnly()) {throw "ReadOnly View";}
+                if (!self.isRoot()) {return delMgr.parentOwner().addMember();}
                 var newMember = context.make("members.makePerson");
-                var temp = mem.members;
-                temp.push(newMember);
-                log (temp)
-                mem.members = temp; //tell context that mem.members changed
-                log(mem.members)
-                return newMember;
+                self.memberAdded(newMember);
+                //var newDelegate = newMember.makeDelegate("adminUse", false);
+                //mapper.put(mem.members, newDelegate, newMember);
+                return mapper.revget(mem.members, newMember);
             },
-            removeMember: function(member) {
+            memberAdded: function(rootMem) {
+                var clientDelegate = rootMem.makeDelegate("adminUse", delMgr.isReadOnly());
+                mapper.put(mem.members, clientDelegate, rootMem);
+                delMgr.delegates().forEach(function(d, i) {d[1].memberAdded(rootMem);});
+            },
+            removeMember: function(clientDelegateMember) {
                 if (delMgr.isReadOnly()) {throw "ReadOnly View";}
-                for (var i = 0; i < mem.members.length; i++) {
-                    if (mem.members[i] === member) {
-                        mem.members.splice(i, 1);
-                        mem.members = mem.members;
-                        member.kill();
-                        return true;
-                    }
-                }
-                throw ("Member not found");
+                var rootMem = mapper.get(mem.members, clientDelegateMember);
+                if (!rootMem){throw ("members.admin.removeMember: Member not found");}
+                if (!delMgr.isRoot()) {return delMgr.parentOwner().removeRootMember(rootMem);}
+                self.removeRootMember(rootMem);                
+            },
+            /** removeRootMember is private, clients should not use it, it will not do anything
+              * for such clients since they do not have references to the rootMember **/
+            removeRootMember: function(rootMember) {
+                if (delMgr.isReadOnly()) {throw "removeRootMember: ReadOnly View";}
+                if (!delMgr.isRoot()) {return delMgr.parentOwner().removeRootMember(rootMember);}
+                self.memberRemoved(rootMember);
+                rootMember.kill();
+            },
+            memberRemoved: function(rootMem) {
+                //note, rootMember is known only to the admins, so this message will
+                // only do something if sent by an admin object
+                var clientDelegate = mapper.revget(mem.members, rootMem);
+                if (!clientDelegate) {console.log("Warning: memberRemoved: no such member"); return false;}
+                delMgr.delegates().forEach(function(d, i){d[1].memberRemoved(rootMem);});
+                mapper.del(mem.members,clientDelegate);
+                clientDelegate.kill();
+                return true;
             },
             isReadOnly: function() {return delMgr.isReadOnly();},
             isRoot: function() {return delMgr.isRoot();},
             makeDelegate: function(purpose, isReadOnly) {
-                return delMgr.makeDelegate(purpose, isReadOnly, "members.makeAdmin");
+                log("new delegate is read only " + isReadOnly)
+                var newDelegate = delMgr.makeDelegate(purpose, isReadOnly, "members.makeAdmin");
+                var memberRoots = mapper.values(mem.members);
+                for (var i in memberRoots) {
+                    newDelegate.memberAdded(memberRoots[i]);
+                }
+                return newDelegate;
             },
             delegates: function() {return delMgr.delegates();},
             kill: function() {
                 //if this is admin root, destroy whole membership system
                 if (delMgr.isRoot()) {
-                    var delCopy = mem.members.map(function(next){return next;});
+                    var delCopy = mem.members.map(function(next){return next[1];});
                     delCopy.forEach(function(next, i){
-                        self.removeMember(next);
+                        self.removeRootMember(next);
                     });
                 }
                 delMgr.kill(context);                
@@ -171,7 +236,7 @@ module.exports = function Members() {
             setData: function(newData) {
                 if (delMgr.isReadOnly()) {throw "Read Only Access";}
                 if (!delMgr.isRoot()) {return delMgr.parentOwner().setData(newData);}
-                for (var next in newData) {log("setdata " + next);mem.data[next] = newData[next];}
+                for (var next in newData) {mem.data[next] = newData[next];}
                 mem.data = mem.data;
                 return true;
             },

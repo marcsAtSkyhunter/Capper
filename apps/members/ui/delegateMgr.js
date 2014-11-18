@@ -5,6 +5,7 @@ function makeDelegationMgr() {
     var C = CapperLayout;
     function link(text, url) {return C.jnode("a").text(text).attr("href", url);}
     var purposeField = C.jnode("input");
+    var readOnlyBox = C.jnode("input").attr("type", "checkbox").attr("checked", true);
     var newDelegateField = C.jspan();
     var delegatesDiv = C.jdiv();
     function refreshDelegateList() {
@@ -18,7 +19,7 @@ function makeDelegationMgr() {
     }
     function addDelegation(){
         var purpose = purposeField.val();
-        CapperConnect.home.post("makeDelegate", purpose, false).
+        CapperConnect.home.post("makeDelegate", purpose, readOnlyBox.prop("checked")).
         then(function(newDelegate){
             newDelegateField.append(link(purpose, newDelegate.webkey));
             refreshDelegateList();
@@ -62,7 +63,7 @@ function makeDelegationMgr() {
     }, stderr("bad isRoot"));
     var div = C.jdiv().append(revokeDiv, C.jnode("p"),
         "Manage Delegations", C.jnode("p"),
-        " Delegate to/for ", purposeField, C.jbutton("Add", addDelegation), C.jbr(),
+        " Delegate to/for ", purposeField, " ReadOnly:", readOnlyBox, C.jbutton("Add", addDelegation), C.jbr(),
         newDelegateField, C.jnode("p"),
         "Current Delegations", C.jbr(),
         delegatesDiv

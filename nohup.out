@@ -1,10 +1,345 @@
 config domain https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/
-config domain https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/
-post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
 post body: []
-post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
 post body: []
-post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
 post body: []
-post query {"s":"tqYu7vdG1G85acbLopzgIFHsS","q":"greet"}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
 post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+true
+false
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+returning: {"=":true}
+returning: {"=":false}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+false
+true
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+returning: {"=":false}
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+false
+true
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+returning: {"=":false}
+returning: {"=":true}
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"members"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=67Y_S30XdsQrsoYOBXXKrPo2P"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=0v6kcQef4JWRvVmHbIK9EIjWd"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=67Y_S30XdsQrsoYOBXXKrPo2P"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=0v6kcQef4JWRvVmHbIK9EIjWd"}]}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isReadOnly"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"67Y_S30XdsQrsoYOBXXKrPo2P","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"0v6kcQef4JWRvVmHbIK9EIjWd","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"67Y_S30XdsQrsoYOBXXKrPo2P","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"67Y_S30XdsQrsoYOBXXKrPo2P","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"67Y_S30XdsQrsoYOBXXKrPo2P","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"members"}
+post body: []
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isReadOnly"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]
+false
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=cU2C2jyUhLtOxtxrjTAOLIT4E"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=QZi33HEn12uAmwdjMEz1t6LS4"}]}
+returning: {"=":false}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"isRoot"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"izDKgg2bi7kfKSU7zmua3pLI0","q":"delegates"}
+post body: []
+[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]
+returning: {"=":[["bob",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=yZfFkXj3yb926Uc8nedTpGyTH"}],["carolEdit",{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=GuphVDv6nXr_1lmUMTGRvBcl_"}]]}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"QZi33HEn12uAmwdjMEz1t6LS4","q":"data"}
+post body: []
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"members"}
+post body: []
+[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=67Y_S30XdsQrsoYOBXXKrPo2P"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=0v6kcQef4JWRvVmHbIK9EIjWd"}]
+returning: {"=":[{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=67Y_S30XdsQrsoYOBXXKrPo2P"},{"@":"https://ec2-54-244-223-127.us-west-2.compute.amazonaws.com:1341/ocaps/#s=0v6kcQef4JWRvVmHbIK9EIjWd"}]}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isReadOnly"}
+post body: []
+true
+returning: {"=":true}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isRoot"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"yZfFkXj3yb926Uc8nedTpGyTH","q":"delegates"}
+post body: []
+[]
+returning: {"=":[]}
+post query {"s":"67Y_S30XdsQrsoYOBXXKrPo2P","q":"data"}
+post body: []
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"delegates"}
+post body: []
+post query {"s":"0v6kcQef4JWRvVmHbIK9EIjWd","q":"data"}
+post body: []
+{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"m1","DateOfBirth":"","Street":"4651 Burnside","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+[]
+returning: {"=":[]}
+{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}
+returning: {"=":{"Name":"alice2","DateOfBirth":"","Street":"219 Silver","City":"","State":"","ZipCode":"","PhoneNumber":""}}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"isReadOnly"}
+post body: []
+false
+returning: {"=":false}
+post query {"s":"cU2C2jyUhLtOxtxrjTAOLIT4E","q":"recordSpec"}
+post body: []
+{"Name":{"type":"string"},"DateOfBirth":{"type":"date"},"Street":{"type":"string"},"City":{"type":"string"},"State":{"type":"string"},"ZipCode":{"type":"int"},"PhoneNumber":{"type":"string"}}
+returning: {"=":{"Name":{"type":"string"},"DateOfBirth":{"type":"date"},"Street":{"type":"string"},"City":{"type":"string"},"State":{"type":"string"},"ZipCode":{"type":"int"},"PhoneNumber":{"type":"string"}}}
