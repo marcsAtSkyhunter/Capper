@@ -79,6 +79,12 @@ Invoking the object with -post should return a result similar to
 
 which is the JSON format of the returned value sent to the client.
 
+The -post argument in launching the server invokes the method locally, from inside the server. We can also use the webkey to access our HelloGalaxy service remotely from a command line by using the remoteCall application. Launch the server, and enter the following command:
+
+>node --harmony remoteCall @webkey greet
+
+This should return "Hello Galaxy" as the answer.
+
 Next lets create a very simple web page to display the new service in the browser. In Capper/apps/HelloGalaxy/ui/index.html, put the following web page:
 ```html
 <html><head>
