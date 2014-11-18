@@ -53,45 +53,19 @@ makeProxy = function(JSONkey) {
             } else {args.push(arguments[i]);}     
         }
         var vowPair = Q.defer();
-        /*
-        var xhr = new XMLHttpRequest();
-        var target = domain + "?s=" + cred + "&q=" + method ;
-        xhr.onreadystatechange=function(){
-            if (xhr.readyState !== 4) {return;}
-            if (xhr.status===200){
-                try {
-                    var ans = JSON.parse(xhr.responseText);
-                    if ("=" in ans) {
-                        vowPair.fulfill(deepProxyConvert(ans["="]));
-                    } else if ("!" in ans) {
-                        vowPair.reject(ans["!"]);		
-                    }else if ("@" in ans){
-                        vowPair.fulfill(makeProxy(ans));                        
-                    } else {
-                        vowPair.reject(
-                            "invalid response not capper/waterken protocol");                        
-                    }                    
-                } catch (err) {vowPair.reject("bad response: " + xhr.responseText);}
-            } else {vowPair.reject("post failed status " + xhr.status);}
-        };
-        xhr.open("POST", target, true);
-        xhr.setRequestHeader("Content-Type","text/plain");
-        var data =  JSON.stringify(args);
-        log("remoteproxy.post args: " + data)
-        xhr.send(data);
-        */
+
         var data ="";
         options.path = urlParts.pathname+"?s=" + cred + "&q=" + method;
         var req = https.request(options, function(res) {
-          log("statusCode: ", res.statusCode);
-          log("headers: ", res.headers);
+          //log("statusCode: ", res.statusCode);
+          //log("headers: ", res.headers);
         
           res.on('data', function(d) {
-            log(d);
+            //log(d);
             data += d;
           });
           res.on("end", function() {
-            log("got end msg");
+            //log("got end msg");
             try {
                 var ans = JSON.parse(data);
                 if ("=" in ans) {
@@ -101,14 +75,22 @@ makeProxy = function(JSONkey) {
                 }else if ("@" in ans){
                     vowPair.fulfill(makeProxy(ans));                        
                 } else {
+                    log("remoteProxy invalid response not capper/waterken protocol");
                     vowPair.reject(
                         "invalid response not capper/waterken protocol");                        
                 }                    
-            } catch (err) {vowPair.reject("bad response: " + err);}
+            } catch (err) {
+                vowPair.reject("bad response: " + err);
+                log("bad remoteProxy response:" + err);
+            }
           });
         });
-        req.on("error", function(err){log("remoteProxy request err: " + err + " on " +
-            JSONkey["@"] + " " + method);});
+        req.on("error", function(err){
+            var msg = "remoteProxy request err: " + err + " on " + 
+                JSONkey["@"] + " " + method;
+            log(msg);
+            vowPair.reject(msg);
+        });
         req.write(JSON.stringify(args));
         req.end();
         return vowPair.promise;
