@@ -21,6 +21,9 @@ var caplib = require("./caplib");
 
 module.exports = function(){
     "use strict";
+
+    function makeSaver(unique, fs, fss, require) {
+
     var dbfile = "capper.db";
     function log(text) {console.log(text);}
     
@@ -79,8 +82,8 @@ module.exports = function(){
 	**/
 	var sysState = {};	
 	function loadSysState(){
-        if (!fs.existsSync(dbfile)) {fs.writeFileSync(dbfile, "{}");}
-        var jsonState = fs.readFileSync(dbfile, 'utf8');
+        if (!fss.existsSync(dbfile)) {fss.writeFileSync(dbfile, "{}");}
+        var jsonState = fss.readFileSync(dbfile, 'utf8');
         if (jsonState.length === 0) {jsonState = "{}";}
         sysState = JSON.parse(jsonState);
 	}
@@ -250,7 +253,7 @@ module.exports = function(){
     }
 	make = function(makerLocation, optInitArgs) {
         setupCheckpoint();
-        var cred = caplib.unique();
+        var cred = unique();
         var newId = credToId(cred);
         sysState[cred] = {data: {}, reviver: makerLocation};
 		var newContext = makeContext(newId);
@@ -326,4 +329,7 @@ module.exports = function(){
         drop: drop
 	};
 	return Object.freeze(self);
+}
+
+    return makeSaver;
 }();
