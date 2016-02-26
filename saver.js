@@ -211,6 +211,7 @@ module.exports = function(){
                         }
                     }
                 } else {data[key] = val;} 
+                return true;
             },
             has: function(name) {return name in data;}
             //delete, iterate, keys
