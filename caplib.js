@@ -12,9 +12,12 @@ with this library; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
+
+ @flow
 */
 
 /*global console, require, module */
+/* jshint esversion: 6, node: true */
 module.exports = function() {
 "use strict";
 /**
@@ -42,7 +45,7 @@ module.exports = function() {
  * However, if there are additional arguments for which there are not tests, it will pass.
  * Duck will throw if it gets a null or undefined for any argument.
  **/
-function typeCheck(args, validTypes) { 
+function typeCheck(args /*:Array<any>*/, validTypes /*: string*/) /*:bool*/ { 
     var types = {
         n: "number",
         s: "string",
@@ -64,17 +67,17 @@ function typeCheck(args, validTypes) {
     return true;
 }
 
-function valid(test, errMsg) {
+function valid(test /*: any*/, errMsg /*: string*/) /*: bool*/ {
     if (test) {return true;}
     console.log("invalid: " + errMsg);
     throw("invalid: " + errMsg);
 }
 
-function tvalid(args, types, additionalTest, errMsg) {
+function tvalid(args /*:Array<any>*/, types /*: string*/, additionalTest /*:bool*/, errMsg /*: string*/) /*:bool*/ {
     return valid(typeCheck(args, types) && additionalTest, errMsg);
 }
 
-function makeUnique(crypto) {
+function makeUnique(crypto /*: Crypto*/) /*: Unique*/{
 
 function unique() {
     var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
@@ -96,7 +99,7 @@ function unique() {
     };
 }
 
-function makeSealerPair() {
+function makeSealerPair() /*: SealerPair*/{
     var holder = null;
     function seal(x) {
         var box = function() {holder = x;};
@@ -112,7 +115,7 @@ function makeSealerPair() {
     return {seal:seal, unseal:unseal};
 }
 
-function cloneMap(m) {
+function cloneMap(m /*: Object*/) /*: Object*/{
     var clone = {};
     for (var key in m) {clone[key] = m[key];}
     return clone;
@@ -131,7 +134,9 @@ function cloneMap(m) {
  * objects it included. Unnecessary loss of encapsulation.
  * Do copy, not in-place replace.
  * */
-function deepObjToJSON(obj, idToWebkey, saver) {
+function deepObjToJSON(obj /*:any*/,
+                       idToWebkey /*: (id: Object) => string*/,
+                       saver /*: Saver*/) /*: any */ {
     if (obj === undefined) {return null;}
     if (obj === null) {return null;}
     if (typeof obj === "function") {
@@ -144,7 +149,7 @@ function deepObjToJSON(obj, idToWebkey, saver) {
         return {"@" : webkey};
     }  
     if (saver.live(obj)) {return {"@": idToWebkey(obj)};}
-    var clone = obj instanceof Array  ? [] : {};
+    var clone /*: any*/= obj instanceof Array  ? [] : {};
     for (var key in obj) {
         clone[key] = deepObjToJSON(obj[key], idToWebkey, saver);
     }
@@ -159,7 +164,8 @@ function deepObjToJSON(obj, idToWebkey, saver) {
  * Converts args preceded with "#" to numbers
  * Converts args preceded with "@" to live refs
  * */
-function argMap(argv, webkeyStringToLive) {
+function argMap(argv /*: Array<string>*/,
+                webkeyStringToLive /*: (webkey: string) => any */) /*: Object*/{
     var args = {}; 
     var serverIndex;
     for (serverIndex  = 0; 
@@ -167,12 +173,14 @@ function argMap(argv, webkeyStringToLive) {
         serverIndex++) {}
     if (serverIndex === argv.length - 1) {return args;}
     var command = argv[serverIndex+1];
-    var commandArgs = argv.splice(serverIndex+2);
-    commandArgs.forEach(function(next, i) {
+    var commandArgs /*: Array<string|number|Object>*/ = [];
+     argv.splice(serverIndex+2).forEach(function(next, i) {
         if (next.indexOf("#") === 0) {
             commandArgs[i] = parseFloat(next.substring(1));
         } else if (next.indexOf("@") === 0) {
             commandArgs[i] = webkeyStringToLive(next.substring(1));
+        } else {
+            commandArgs[i] = next;
         }
     });
     args[command] = commandArgs;
@@ -180,16 +188,15 @@ function argMap(argv, webkeyStringToLive) {
 }
 
 
-function makeFileUtils(fs, path) {
+function makeFileUtils(fs /*:FSSync*/, path /*: Path*/) /*: FileUtils*/ {
 
 function copyFile(src, dest) {
     var data = fs.readFileSync(src);
     fs.writeFileSync(dest, data);
 }
-function copyRecurse(src, dest) {
+function copyRecurse(src /*: string*/, dest /*: string*/) /*: void*/{
   var exists = fs.existsSync(src);
-  var stats = exists && fs.statSync(src);
-  var isDirectory = exists && stats.isDirectory();
+  var isDirectory = exists ? fs.statSync(src).isDirectory() : null;
   if (exists && isDirectory) {
     fs.mkdirSync(dest);
     fs.readdirSync(src).forEach(function(childItemName) {

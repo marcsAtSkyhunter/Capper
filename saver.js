@@ -12,16 +12,21 @@ with this library; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
+
+@flow
 */
 
 /*global require, Map, console, Proxy, setImmediate */
+/* jshint esversion: 6, node: true */
 var Q = require("q");
 var caplib = require("./caplib");
 
 module.exports = function(){
     "use strict";
 
-    function makeSaver(unique, fs, fss, require) {
+    function makeSaver(unique /*: () => string*/,
+                       fs /*: FSAccess*/, fss /*: FSSync*/,
+                       require /*: Loader*/) /*: Saver */ {
 
     var dbfile = "capper.db";
     function log(text) {console.log(text);}
@@ -130,11 +135,12 @@ module.exports = function(){
 	var liveState = {};
 
     //each key is the ref to the live object, the value is the id that contains the cred
-    var liveToId = new Map();
+    var liveToId /*: Map<any, Object>*/ = new Map();
     
-    function asId(ref) {
-        if (liveToId.has(ref)){return liveToId.get(ref); }
-        throw ("asId bad ref");
+    function asId(ref) /*: Object*/{
+        var id = liveToId.get(ref);
+        if (id === undefined) throw ("asId bad ref");
+        return id;
     }
     function hasId(ref) {return liveToId.has(ref);}
 
@@ -235,11 +241,12 @@ module.exports = function(){
      *  
 	 */
 	function makeContext(id, constructorLocation) {
-		var newContext = {make: make, state: new State(id)};
-		newContext.drop = function() {drop(id);};
-        newContext.isPersistent = function(obj) {
+		var newContext = {make: make, state: new State(id),
+		              drop: function() {drop(id);},
+        isPersistent: function(obj) {
             var id = liveToId.get(obj);
             return id !== undefined && id !== null;
+        }
         };
 		return Object.freeze(newContext);
 	}
@@ -288,7 +295,8 @@ module.exports = function(){
         var ansPair = Q.defer();
 		var target = live(id);
         try {
-		    var ans = target[method].apply(undefined, actualArgs);
+	    var targetMethod = target ? target[method] : {};
+	            var ans = targetMethod.apply(undefined, actualArgs);
             checkpoint().then(function(ok){
                 ansPair.resolve(ans);
             });

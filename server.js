@@ -12,9 +12,12 @@ with this library; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 Please contact the Hewlett-Packard Company <www.hp.com> for
 information regarding how to obtain the source code for this library.
+
+ @flow
 */
 
 /*global require, console, process */
+/* jshint esversion: 6, node: true */
 "use strict";
 var Q = require("q");
 var caplib = require("./caplib");
