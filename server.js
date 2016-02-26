@@ -201,6 +201,7 @@ function main(argv, require, crypto, fs, fsSync, https, express) {
         const sturdy = makeSturdy(saver, config.domain);
         const wkeyStringToLive = sturdy.wkeyStringToLive;
         const idToWebkey = sturdy.idToWebkey;
+        const vowAnsToVowJSONString = sturdy.vowAnsToVowJSONString;
 
     var argMap = caplib.argMap(argv, wkeyStringToLive);
     if ("-drop" in argMap) {
@@ -227,10 +228,10 @@ function main(argv, require, crypto, fs, fsSync, https, express) {
         }
     } else {
         const app = makeApp(express, saver, config.domain);
-        const sslOptions = sslOptions(fsSync);
+        const sslOpts = sslOptions(fsSync);
         const port = config.port;
 
-        var s = https.createServer(sslOptions, app);
+        var s = https.createServer(sslOpts, app);
         s.listen(port);    
     }
     });
