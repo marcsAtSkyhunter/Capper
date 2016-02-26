@@ -16,13 +16,12 @@ information regarding how to obtain the source code for this library.
 
 /*global require, console, process */
 "use strict";
-var https = require("https");
-var fs = require("fs");
-var express = require("express");
 var Q = require("q");
 var caplib = require("./caplib");
-var saver = require("./saver");
+var makeSaver = require("./saver");
 var log = function(text) {console.log(text);};
+
+function makeConfig(fs) {
 
 var domain;
 var port;
@@ -33,8 +32,13 @@ fs.readFile("capper.config", "utf8", function(err, data) {
     port = config.port;
     domain = config.protocol + "://" + config.domain + ":" + config.port + "/";
     log("config domain " + domain);
-    deferStart.resolve(true);
+    deferStart.resolve({domain: domain, port: port});
 });
+
+    return deferStart.promise;
+}
+
+function sslOptions(fs) {
 var sslOptions = {
   key: fs.readFileSync('./ssl/server.key'),
   cert: fs.readFileSync('./ssl/server.crt'),
@@ -42,7 +46,10 @@ var sslOptions = {
   requestCert: true,
   rejectUnauthorized: false
 };
-var app = express();
+    return sslOptions;
+}
+
+
 function parseBody(req, res, next) {
   req.rawBody = '';
   req.setEncoding('utf8');
@@ -65,6 +72,8 @@ function reviverToUIPath(reviver) {
     revstring += filename + ".html";
     return revstring;
 }
+
+function makeSturdy(saver, domain) {
 
 function vowAnsToVowJSONString(vowAns) {
     return vowAns.then(function(ans) {
@@ -94,6 +103,26 @@ function webkeyToLive(wkeyObj) {
 function idToWebkey(id) {
     return domain + "ocaps/#s=" + saver.idToCred(id);
 }
+
+function wkeyStringToLive(keyString) {
+    return webkeyToLive({"@": keyString});
+}
+
+    return {
+        idToWebkey: idToWebkey,
+        vowAnsToVowJSONString: vowAnsToVowJSONString,
+        webkeyToLive: webkeyToLive,
+        wkeyStringToLive
+    };
+}
+
+// express is *nearly* powerless, but it seems to appeal
+// to at least path.resolve()
+function makeApp(express, saver, sturdy) {
+    var webkeyToLive = sturdy.webkeyToLive;
+    var vowAnsToVowJSONString = sturdy.vowAnsToVowJSONString;
+
+var app = express();
 app.get("/views/:filename", function(req, res) {
 	res.sendfile("./views/" + req.params.filename);
 });
@@ -160,11 +189,20 @@ function invokeActor(req, res){
 }
 app.post("/ocaps/", parseBody, invokeActor);
 
-function wkeyStringToLive(keyString) {
-    return webkeyToLive({"@": keyString});
+    return app;
 }
-deferStart.promise.then(function(){
-    var argMap = caplib.argMap(process.argv, wkeyStringToLive);
+
+
+function main(argv, require, crypto, fs, fsSync, https, express) {
+    const unique = caplib.makeUnique(crypto);
+    const saver = makeSaver(unique.unique, fs, fsSync, require);
+
+    makeConfig(fs).then(config => {
+        const sturdy = makeSturdy(saver, config.domain);
+        const wkeyStringToLive = sturdy.wkeyStringToLive;
+        const idToWebkey = sturdy.idToWebkey;
+
+    var argMap = caplib.argMap(argv, wkeyStringToLive);
     if ("-drop" in argMap) {
         saver.drop(saver.credToId(argMap["-drop"][0]));
         saver.checkpoint().then(function() {console.log("drop done");});
@@ -188,7 +226,25 @@ deferStart.promise.then(function(){
             });
         }
     } else {
+        const app = makeApp(express, saver, config.domain);
+        const sslOptions = sslOptions(fsSync);
+        const port = config.port;
+
         var s = https.createServer(sslOptions, app);
         s.listen(port);    
     }
-});
+    });
+}
+
+
+if (require.main == module) {
+    main(process.argv,
+         require,  // to load app modules
+         require("crypto"),
+         { readFile: require("fs").readFile,
+           writeFile: require("fs").writeFile },
+         require("fs"),
+         { createServer: require("https").createServer },
+         require("express")
+        );
+}
