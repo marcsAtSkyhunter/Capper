@@ -17,9 +17,6 @@ information regarding how to obtain the source code for this library.
 /*global console, require, module */
 module.exports = function() {
 "use strict";
-var fs = require("fs");
-var path = require("path");
-var crypto = require("crypto");
 /**
  * Function typeCheck allows a quick, concise limited form of duck typing of the
  * arguments to a function. The function using typeCheck should pass in its 
@@ -77,6 +74,8 @@ function tvalid(args, types, additionalTest, errMsg) {
     return valid(typeCheck(args, types) && additionalTest, errMsg);
 }
 
+function makeUnique(crypto) {
+
 function unique() {
     var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     var ans = "";
@@ -91,6 +90,12 @@ function unique() {
    //}
    return ans;
 }
+
+    return {
+        unique: unique
+    };
+}
+
 function makeSealerPair() {
     var holder = null;
     function seal(x) {
@@ -174,6 +179,9 @@ function argMap(argv, webkeyStringToLive) {
     return args;
 }
 
+
+function makeFileUtils(fs, path) {
+
 function copyFile(src, dest) {
     var data = fs.readFileSync(src);
     fs.writeFileSync(dest);    
@@ -205,17 +213,22 @@ function makeNewServer() {
     copyIfAbsent("ssl");
 }
 
+    return {
+        makeNewServer: makeNewServer,
+        copyRecurse: copyRecurse
+    };
+}
+
 var self = {
     typeCheck: typeCheck,
-    unique: unique,
+    makeUnique: makeUnique,
     valid: valid,
     tvalid: tvalid,
     makeSealerPair: makeSealerPair,
     cloneMap: cloneMap,
     argMap:argMap,
     deepObjToJSON: deepObjToJSON,
-    makeNewServer: makeNewServer,
-    copyRecurse: copyRecurse
+    makeFileUtils: makeFileUtils
 };
 return self;
 
