@@ -65,18 +65,18 @@ function reviverToUIPath(reviver) {
     revstring += filename + ".html";
     return revstring;
 }
-function getObj(req) {
-    var cred = req.query.s;
-    var id = saver.credToId(cred);
-    var reviver = saver.reviver(id);
-    var live = saver.live(id);
-    return {
-        cred: cred,
-        reviver: reviver,
-        live: live,
-        id: id,
-        method: req.query.q
-    };
+
+function vowAnsToVowJSONString(vowAns) {
+    return vowAns.then(function(ans) {
+        var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
+        log(JSON.stringify(result));
+        if (result !== null && typeof result === "object" && ("@" in result)) {
+            return JSON.stringify(result);
+        } else {return JSON.stringify({"=": result});}
+   }, function(err){
+        log("vowAnsToVowJSONString err " + err);
+        return JSON.stringify({"!": err});
+   });
 }
 /**
 * webkeyToLive(wkeyObj) looks to see if the arg is a webkeyObject, if so, 
@@ -106,6 +106,21 @@ app.get("/apps/:theapp/ui/:filename", function(req, res) {
 app.get('/', function(req, res) {
     res.sendfile('./views/index.html');
 });
+
+function getObj(req) {
+    var cred = req.query.s;
+    var id = saver.credToId(cred);
+    var reviver = saver.reviver(id);
+    var live = saver.live(id);
+    return {
+        cred: cred,
+        reviver: reviver,
+        live: live,
+        id: id,
+        method: req.query.q
+    };
+}
+
 function showActor(req, res) {
     if (!req.query.s ) {
         res.sendfile("./bootstrap.html");
@@ -124,19 +139,6 @@ function showActor(req, res) {
     }
 }
 app.get("/ocaps/", showActor);
-
-function vowAnsToVowJSONString(vowAns) {    
-    return vowAns.then(function(ans) {
-        var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
-        log(JSON.stringify(result))
-        if (result !== null && typeof result === "object" && ("@" in result)) {
-            return JSON.stringify(result);            
-        } else {return JSON.stringify({"=": result});}     
-   }, function(err){
-        log("vowAnsToVowJSONString err " + err);
-        return JSON.stringify({"!": err});
-   });
-}
 
 function invokeActor(req, res){
     log("post query " + JSON.stringify(req.query));
