@@ -176,7 +176,7 @@ function argMap(argv, webkeyStringToLive) {
 
 function copyFile(src, dest) {
     var data = fs.readFileSync(src);
-    fs.writeFileSync(dest);    
+    fs.writeFileSync(dest, data);
 }
 function copyRecurse(src, dest) {
   var exists = fs.existsSync(src);
