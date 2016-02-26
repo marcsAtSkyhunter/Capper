@@ -15,7 +15,6 @@ information regarding how to obtain the source code for this library.
 */
 
 /*global require, Map, console, Proxy, setImmediate */
-var fs = require("fs");
 var Q = require("q");
 var caplib = require("./caplib");
 
