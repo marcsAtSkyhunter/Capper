@@ -24,6 +24,45 @@
     "express": "~3.4.1"
   },
   "devDependencies": {
+    "eslint": "^2.2.0",
     "mocha": "~1.19.0"
+  },
+  "eslintConfig": {
+    "ecmaVersion": 6,
+    "extends": "eslint:recommended",
+    "rules": {
+      "indent": [
+        2,
+        4
+      ],
+      "no-trailing-spaces": 2,
+      "quotes": [
+        1,
+        "double"
+      ],
+      "no-console": 0,
+      "brace-style": [
+        1,
+        "1tbs",
+        {
+          "allowSingleLine": true
+        }
+      ],
+      "block-spacing": [
+        2,
+        "never"
+      ],
+      "array-bracket-spacing": [
+        2,
+        "never"
+      ],
+      "no-unused-vars": [
+        2,
+        {
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ]
+    }
   }
 }
