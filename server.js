@@ -231,7 +231,7 @@ function main(argv, require, crypto, fs, fsSync, https, express) {
                 });
             }
         } else {
-            const app = makeApp(express, saver, config.domain);
+            const app = makeApp(express, saver, sturdy);
             const sslOpts = sslOptions(fsSync);
             const port = config.port;
 
