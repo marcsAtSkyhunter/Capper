@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright 2011 Hewlett-Packard Company. This library is free software;
 you can redistribute it and/or modify it under the terms of the GNU
 Lesser General Public License (LGPL) as published by the Free Software
@@ -22,7 +22,7 @@ module.exports = function() {
 "use strict";
 /**
  * Function typeCheck allows a quick, concise limited form of duck typing of the
- * arguments to a function. The function using typeCheck should pass in its 
+ * arguments to a function. The function using typeCheck should pass in its
  * arguments plus a character specifying a type for each argument to be
  * tested. The types are:
  *    {
@@ -41,25 +41,25 @@ module.exports = function() {
  * If the first two arguments to add were not numbers, typeCheck logs to console and returns false.
  *
  * Additional rules:
- * Duck will throw an exception if there are more tests than arguments. 
+ * Duck will throw an exception if there are more tests than arguments.
  * However, if there are additional arguments for which there are not tests, it will pass.
  * Duck will throw if it gets a null or undefined for any argument.
  **/
-function typeCheck(args /*:Array<any>*/, validTypes /*: string*/) /*:bool*/ { 
+function typeCheck(args /*:Array<any>*/, validTypes /*: string*/) /*:bool*/ {
     var types = {
         n: "number",
         s: "string",
         f: "function",
         o: "object",
         b: "boolean"
-    };  
+    };
     //you can have untested args, but not tests for which there are no args
-    if (args.length < validTypes.length) {throw "typeCheck has more tests than args";}    
+    if (args.length < validTypes.length) {throw "typeCheck has more tests than args";}
     for (var i = 0; i < validTypes.length; i++) {
         if (args[i] === null) {console.log("typeCheck found null"); return false;}
         var typ = validTypes[i];
         if (typeof(args[i]) !== types[typ]) {
-            console.log("typeCheck bad arg " + i + " should be: " + typ  + 
+            console.log("typeCheck bad arg " + i + " should be: " + typ  +
 			" was " + typeof(args[i]));
             return false;
         }
@@ -122,13 +122,13 @@ function cloneMap(m /*: Object*/) /*: Object*/{
 }
 /**
  * If the obj is a persistent object, or if the obj contains a ref to a persistent
- * object, or the id of a persistent obj ({"@id": cred}), replace the object with 
+ * object, or the id of a persistent obj ({"@id": cred}), replace the object with
  * a webkey object (i.e., {"@" : webkey}). If
  * a function is encountered, convert to null and log it. In all other cases,
  * leave it alone.
- * 
+ *
  * In the end, return the json string of the result.
- * 
+ *
  * TODO: the in-place replacement makes it possible for the persistent app
  * that produced this array or map to see the webkeys of the live
  * objects it included. Unnecessary loss of encapsulation.
@@ -147,7 +147,7 @@ function deepObjToJSON(obj /*:any*/,
     if (saver.hasId(obj)) {
         var webkey = idToWebkey(saver.asId(obj));
         return {"@" : webkey};
-    }  
+    }
     if (saver.live(obj)) {return {"@": idToWebkey(obj)};}
     var clone /*: any*/= obj instanceof Array  ? [] : {};
     for (var key in obj) {
@@ -157,19 +157,19 @@ function deepObjToJSON(obj /*:any*/,
 }
 
 /**
- * finding commands such as drop and make, if a command line has an arg 
+ * finding commands such as drop and make, if a command line has an arg
  * after "server" make the rest of the args elements in map
- * Returns map with one entry, the first post=server element as key, 
+ * Returns map with one entry, the first post=server element as key,
  * following args as list
  * Converts args preceded with "#" to numbers
  * Converts args preceded with "@" to live refs
  * */
 function argMap(argv /*: Array<string>*/,
                 webkeyStringToLive /*: (webkey: string) => any */) /*: Object*/{
-    var args = {}; 
+    var args = {};
     var serverIndex;
-    for (serverIndex  = 0; 
-        serverIndex < argv.length && argv[serverIndex].indexOf ("server") < 0; 
+    for (serverIndex  = 0;
+        serverIndex < argv.length && argv[serverIndex].indexOf ("server") < 0;
         serverIndex++) {}
     if (serverIndex === argv.length - 1) {return args;}
     var command = argv[serverIndex+1];
