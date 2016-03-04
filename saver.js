@@ -24,10 +24,9 @@ var caplib = require("./caplib");
 
 exports.makeSaver = makeSaver;
 function makeSaver(unique /*: () => string*/,
-                   fs /*: FSAccess*/, fss /*: FSSync*/,
+                   dbfile /*: SyncAccess*/,
                    reviverToMaker /*: (path: string) => any*/) /*: Saver */
 {
-    var dbfile = "capper.db";
     function log(text) {console.log(text);}
 
     // modifiedObjs has a cred as key and null as value; it is a set
@@ -85,8 +84,8 @@ function makeSaver(unique /*: () => string*/,
      **/
     var sysState = {};
     function loadSysState() {
-        if (!fss.existsSync(dbfile)) {fss.writeFileSync(dbfile, "{}");}
-        var jsonState = fss.readFileSync(dbfile, "utf8");
+        if (!dbfile.existsSync()) {dbfile.writeSync("{}");}
+        var jsonState = dbfile.readTextSync("utf8");
         if (jsonState.length === 0) {jsonState = "{}";}
         sysState = JSON.parse(jsonState);
     }
@@ -118,13 +117,14 @@ function makeSaver(unique /*: () => string*/,
             last.then(function(_ok) {
                 var jsonState = JSON.stringify(sysState);
                 checkpointNeeded = false; //yes, say it again on each turn
-                fs.writeFile(dbfile, jsonState, function (err) {
-                    if (err) {
+                var dbunsync = dbfile.unsync();
+                return dbunsync.writeText(jsonState)
+                    .then(function() {vowPair.resolve(true)})
+                    .catch(function (err) {
                         console.log("checkpoint failed: " + err);
                         vowPair.reject(err);
-                    } else {vowPair.resolve(true);}
+                    });
                     //log("db size after write: "+ fs.statSync("capper.db").size);
-                });
             });
         }
         return vowPair.promise;

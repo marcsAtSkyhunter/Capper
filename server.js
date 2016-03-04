@@ -24,31 +24,86 @@ var caplib = require("./caplib");
 var makeSaver = require("./saver").makeSaver;
 var log = function(text) {console.log(text);};
 
-function makeConfig(fs) {
-    var domain;
-    var port;
-    var deferStart = Q.defer();
-    fs.readFile("capper.config", "utf8", function(err, data) {
-        if (err) {log("bad capper.config file" + err); throw(err);}
-        var config = JSON.parse(data);
-        port = config.port;
-        domain = config.protocol + "://" + config.domain + ":" + config.port + "/";
-        log("config domain " + domain);
-        deferStart.resolve({domain: domain, port: port});
-    });
 
-    return deferStart.promise;
+function main(argv, require, crypto, fs, path, createServer, express) {
+    var unique = caplib.makeUnique(crypto).unique;
+    var reviver = makeReviver(require);
+    const dbfile = fsSyncAccess(fs, path.join, "capper.db");
+    var rd = p => fsReadAccess(fs, path.join, p);
+    var sslDir = rd("./ssl");
+
+    makeConfig(rd("capper.config")).then(config => {
+        run(argv, config, reviver, unique, sslDir, dbfile,
+            createServer, express);
+    });
 }
 
-function sslOptions(fs) {
-    var sslOptions = {
-        key: fs.readFileSync("./ssl/server.key"),
-        cert: fs.readFileSync("./ssl/server.crt"),
-        ca: fs.readFileSync("./ssl/ca.crt"),
-        requestCert: true,
-        rejectUnauthorized: false
-    };
-    return sslOptions;
+var exports = module.exports;
+exports.fsReadAccess = fsReadAccess;
+function fsReadAccess(fs /*: FileSystem */,
+                      join /*:(...parts: Array<string>) => string*/,
+                      path /*: string*/) /*: ReadAccess*/ {
+    return Object.freeze({
+        readText: (encoding /*: string*/) =>
+            Q.nfcall(fs.readFile, path, encoding),
+        readBytes: () =>
+            Q.nfcall(fs.readFile, path),
+        subRd: (other) => fsReadAccess(fs, join, join(path, other))
+    });
+}
+
+exports.fsWriteAccess = fsWriteAccess;
+function fsWriteAccess(fs /*: FileSystem */,
+                       join /*:(...parts: Array<string>) => string*/,
+                       path /*: string*/) /*: WriteAccess*/ {
+    return Object.freeze({
+        writeText: (text) =>
+            Q.nfcall(fs.writeFile, path, text),
+        subWr: (other) => fsWriteAccess(fs, join, join(path, other)),
+        ro: () => fsReadAccess(fs, join, path)
+    });
+}
+
+exports.fsSyncAccess = fsSyncAccess;
+function fsSyncAccess(fs /*: FileSystem */,
+                      join /*:(...parts: Array<string>) => string*/,
+                      path /*: string*/) /*: SyncAccess*/ {
+    return Object.freeze({
+        existsSync: () => fs.existsSync(path),
+        readTextSync: (encoding) => fs.readFileSync(path, encoding),
+        writeSync: (contents) => fs.writeFileSync(path, contents),
+        unsync: () => fsWriteAccess(fs, join, path)
+    });
+}
+
+/*::
+type Config = {
+  domain: string,
+   port: number
+};
+*/
+exports.makeConfig = makeConfig;
+function makeConfig(rd /*: ReadAccess */) /*: Promise<Config>*/ {
+    return rd.readText("utf8").then(data => {
+        var config = JSON.parse(data);
+        var port = config.port;
+        var domain = config.protocol + "://" + config.domain + ":" + config.port + "/";
+        log("config domain " + domain);
+        return {domain: domain, port: port};
+    }).catch(err => {log("bad capper.config file" + err); throw(err);});
+}
+
+function sslOptions(files /*: ReadAccess */) {
+    var file = name => files.subRd(name).readBytes();
+    return Q.spread(
+        [file("server.key"), file("server.crt"), file("ca.crt")],
+        (key, cert, ca) => ({
+            key: key,
+            cert: cert,
+            ca: ca,
+            requestCert: true,
+            rejectUnauthorized: false
+        }));
 }
 
 
@@ -68,14 +123,32 @@ function parseBody(req, res, next) {
     });
 }
 
-function reviverToUIPath(reviver) {
-    var revstring = "./apps/";
-    var parts = reviver.split(".");
-    revstring = revstring + parts[0] + "/ui/";
-    var filename = parts.length > 1 ? parts[1] : "index";
-    revstring += filename + ".html";
-    return revstring;
+
+function makeReviver(require) /*: Reviver*/ {
+    function toMaker(reviver) {
+        var parts = reviver.split(".");
+        var path = "./apps/" + parts[0] +"/server/main.js";
+        var maker = require(path);
+        if (parts.length === 2) {maker = maker[parts[1]];}
+        return maker;
+    }
+
+    function sendUI(res, reviver) {
+        var revstring = "./apps/";
+        var parts = reviver.split(".");
+        revstring = revstring + parts[0] + "/ui/";
+        var filename = parts.length > 1 ? parts[1] : "index";
+        revstring += filename + ".html";
+        res.sendfile(revstring);
+    }
+
+    return Object.freeze({
+        toMaker: toMaker,
+        sendUI: sendUI
+    });
 }
+
+
 
 function makeSturdy(saver, domain) {
 
@@ -120,9 +193,8 @@ function makeSturdy(saver, domain) {
     };
 }
 
-// express is *nearly* powerless, but it seems to appeal
-// to at least path.resolve()
-function makeApp(express, saver, sturdy) {
+
+function makeApp(express, saver, sturdy, sendUI) {
     var webkeyToLive = sturdy.webkeyToLive;
     var vowAnsToVowJSONString = sturdy.vowAnsToVowJSONString;
 
@@ -164,8 +236,9 @@ function makeApp(express, saver, sturdy) {
                 //res.setHeader("Content-Security-Policy", "default-src: 'self'");
                 //log("set CSP header");
                 //res.writeHead(200)
-                res.sendfile(reviverToUIPath(objdata.reviver));
+                sendUI(res, objdata.reviver);
             } catch (err) {
+                console.log('showActor not found:', err);
                 res.send("Object not Found");
                 //res.close();
             }
@@ -197,55 +270,52 @@ function makeApp(express, saver, sturdy) {
 }
 
 
-function main(argv, require, crypto, fs, fsSync, https, express) {
-    var unique = caplib.makeUnique(crypto);
-    var saver = makeSaver(unique.unique, fs, fsSync, reviverToMaker);
+/*::
+// only import the types, not the ambient authority.
+const https = require("https");
+ */
 
-    makeConfig(fs).then(config => {
-        const sturdy = makeSturdy(saver, config.domain);
-        const wkeyStringToLive = sturdy.wkeyStringToLive;
-        const idToWebkey = sturdy.idToWebkey;
-        const vowAnsToVowJSONString = sturdy.vowAnsToVowJSONString;
+exports.run = run;
+function run(argv /*: Array<string>*/,
+             config /*: Config*/,
+             reviver /*: Reviver*/,
+             unique /*: () => string*/,
+             sslDir /*: ReadAccess*/,
+             dbfile /*: SyncAccess*/,
+             createServer /*: typeof https.createServer */,
+             express /*: () => Application */) {
+    const saver = makeSaver(unique, dbfile, reviver.toMaker);
+    const sturdy = makeSturdy(saver, config.domain);
 
-        var argMap = caplib.argMap(argv, wkeyStringToLive);
-        if ("-drop" in argMap) {
-            saver.drop(saver.credToId(argMap["-drop"][0]));
-            saver.checkpoint().then(function() {console.log("drop done");});
-        } else if ("-make" in argMap){
-            var obj = saver.make.apply(undefined, argMap["-make"]);
-            if (!obj) {log("cannot find maker " + argMap["-make"]); return;}
-            saver.checkpoint().then(function() {
-                log(idToWebkey(saver.asId(obj)));
-            });
-        } else if ("-post" in argMap) {
-            var args = argMap["-post"];
-            if (typeof args[0] !== "object") {
-                log("bad target object webkey; forget '@'?");
-            } else if (typeof args[1] !== "string") {
-                log("method to invoke is not a string");
-            } else {
-                args[0] = saver.asId(args[0]);
-                var vowAns = saver.deliver.apply(undefined, args);
-                vowAnsToVowJSONString(vowAns).then(function(answer){
-                    log(answer);
-                });
-            }
+    var argMap = caplib.argMap(argv, sturdy.wkeyStringToLive);
+    if ("-drop" in argMap) {
+        saver.drop(saver.credToId(argMap["-drop"][0]));
+        saver.checkpoint().then(function() {console.log("drop done");});
+    } else if ("-make" in argMap){
+        var obj = saver.make.apply(undefined, argMap["-make"]);
+        if (!obj) {log("cannot find maker " + argMap["-make"]); return;}
+        saver.checkpoint().then(function() {
+            log(sturdy.idToWebkey(saver.asId(obj)));
+        });
+    } else if ("-post" in argMap) {
+        var args = argMap["-post"];
+        if (typeof args[0] !== "object") {
+            log("bad target object webkey; forget '@'?");
+        } else if (typeof args[1] !== "string") {
+            log("method to invoke is not a string");
         } else {
-            const app = makeApp(express, saver, sturdy);
-            const sslOpts = sslOptions(fsSync);
-            const port = config.port;
-
-            var s = https.createServer(sslOpts, app);
-            s.listen(port);
+            args[0] = saver.asId(args[0]);
+            var vowAns = saver.deliver.apply(undefined, args);
+            sturdy.vowAnsToVowJSONString(vowAns).then(function(answer){
+                log(answer);
+            });
         }
-    });
-
-    function reviverToMaker(reviver) {
-        var parts = reviver.split(".");
-        var path = "./apps/" + parts[0] +"/server/main.js";
-        var maker = require(path);
-        if (parts.length === 2) {maker = maker[parts[1]];}
-        return maker;
+    } else {
+        const app = makeApp(express, saver, sturdy, reviver.sendUI);
+        sslOptions(sslDir).then(sslOpts => {
+            var s = createServer(sslOpts, app);
+            s.listen(config.port);
+        });
     }
 }
 
@@ -254,10 +324,8 @@ if (require.main == module) {
     main(process.argv,
          require,  // to load app modules
          require("crypto"),
-         { readFile: require("fs").readFile,
-           writeFile: require("fs").writeFile },
-         require("fs"),
-         { createServer: require("https").createServer },
+         require("fs"), require("path"),
+         require("https").createServer,
          require("express")
         );
 }

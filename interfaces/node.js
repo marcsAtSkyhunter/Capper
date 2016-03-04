@@ -1,12 +1,16 @@
 // cribbed from
 // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/node/node.d.ts
-type FSAccess = {
-  writeFile(filename: string, data: any, callback?: (err: ErrnoException) => void): void;
-}
-type FSSync = {
+type FileSystem = {
     existsSync(path: string): boolean;
+    readFile(filename: string, encoding: string,
+             callback: (err: ?Error, data: string) => void): void;
     readFileSync<T, U>(filename: string, options?: T): U;
     writeFileSync(filename: string, data: string | Buffer, options?: { encoding?: string; mode?: number; flag?: string; }): void;
+    writeFile(filename: string,
+              data: Buffer | string,
+              options?: Object | string,
+              callback?: (err: ?Error) => void
+             ): void;
     mkdirSync(path: string, mode?: number): void;
     readdirSync(path: string): string[];
     statSync(path: string): Stats;

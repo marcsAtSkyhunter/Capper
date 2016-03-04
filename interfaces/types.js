@@ -1,3 +1,8 @@
+type Reviver = {
+    toMaker(reviver: string): any,
+    sendUI(res: Response, reviver: string): void;
+};
+
 type Saver = {
     deliver(id: Object, method: string, ...optArgs: Array<any>): Promise<any>;
     make(makerLocation: string, optInitArgs: ?Array<any>): Object;
@@ -11,11 +16,25 @@ type Saver = {
     drop(id: Object): void;
 };
 
-type Loader = (path: string) => any;
 
-type FileUtils = {
-    makeNewServer(): void;
-    copyRecurse(src : string, dest : string): void;
+type ReadAccess = {
+  readBytes(): Promise<any>;
+  readText(encoding: string): Promise<string>;
+  subRd(other: string): ReadAccess;
+}
+
+
+type WriteAccess = {
+    writeText(text: string): Promise<void>;
+    ro(): ReadAccess;
+}
+
+
+type SyncAccess = {
+    existsSync(): boolean;
+    readTextSync(encoding: string): string;
+    writeSync(text: string): void;
+    unsync(): WriteAccess;
 }
 
 
