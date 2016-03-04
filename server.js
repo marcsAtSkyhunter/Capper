@@ -199,7 +199,7 @@ function makeApp(express, saver, sturdy) {
 
 function main(argv, require, crypto, fs, fsSync, https, express) {
     var unique = caplib.makeUnique(crypto);
-    var saver = makeSaver(unique.unique, fs, fsSync, require);
+    var saver = makeSaver(unique.unique, fs, fsSync, reviverToMaker);
 
     makeConfig(fs).then(config => {
         const sturdy = makeSturdy(saver, config.domain);
@@ -239,6 +239,14 @@ function main(argv, require, crypto, fs, fsSync, https, express) {
             s.listen(port);
         }
     });
+
+    function reviverToMaker(reviver) {
+        var parts = reviver.split(".");
+        var path = "./apps/" + parts[0] +"/server/main.js";
+        var maker = require(path);
+        if (parts.length === 2) {maker = maker[parts[1]];}
+        return maker;
+    }
 }
 
 

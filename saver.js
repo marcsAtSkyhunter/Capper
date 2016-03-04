@@ -25,7 +25,7 @@ var caplib = require("./caplib");
 exports.makeSaver = makeSaver;
 function makeSaver(unique /*: () => string*/,
                    fs /*: FSAccess*/, fss /*: FSSync*/,
-                   require /*: Loader*/) /*: Saver */
+                   reviverToMaker /*: (path: string) => any*/) /*: Saver */
 {
     var dbfile = "capper.db";
     function log(text) {console.log(text);}
@@ -254,13 +254,6 @@ function makeSaver(unique /*: () => string*/,
         return Object.freeze(newContext);
     }
 
-    function reviverToMaker(reviver) {
-        var parts = reviver.split(".");
-        var path = "./apps/" + parts[0] +"/server/main.js";
-        var maker = require(path);
-        if (parts.length === 2) {maker = maker[parts[1]];}
-        return maker;
-    }
     make = function(makerLocation, _optInitArgs) {
         setupCheckpoint();
         var cred = unique();
