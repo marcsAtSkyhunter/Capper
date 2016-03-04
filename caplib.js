@@ -16,9 +16,9 @@ information regarding how to obtain the source code for this library.
  @flow
 */
 
-/*global console, require, module */
+/*global console, module */
 /* jshint esversion: 6, node: true */
-module.exports = function() {
+
 "use strict";
 /**
  * Function typeCheck allows a quick, concise limited form of duck typing of the
@@ -60,7 +60,7 @@ function typeCheck(args /*:Array<any>*/, validTypes /*: string*/) /*:bool*/ {
         var typ = validTypes[i];
         if (typeof(args[i]) !== types[typ]) {
             console.log("typeCheck bad arg " + i + " should be: " + typ  +
-			" was " + typeof(args[i]));
+                        " was " + typeof(args[i]));
             return false;
         }
     }
@@ -79,20 +79,20 @@ function tvalid(args /*:Array<any>*/, types /*: string*/, additionalTest /*:bool
 
 function makeUnique(crypto /*: Crypto*/) /*: Unique*/{
 
-function unique() {
-    var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    var ans = "";
-    var buf = crypto.randomBytes(25);
-    for (var i = 0; i < buf.length; i++) {
-        var index = buf[i] % chars.length;
-        ans += chars[index];
+    function unique() {
+        var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+        var ans = "";
+        var buf = crypto.randomBytes(25);
+        for (var i = 0; i < buf.length; i++) {
+            var index = buf[i] % chars.length;
+            ans += chars[index];
+        }
+        //while (ans.length < 30) {
+        //   var nextI = Math.floor(Math.random()*10000) % chars.length;
+        //   ans += chars[nextI];
+        //}
+        return ans;
     }
-   //while (ans.length < 30) {
-   //   var nextI = Math.floor(Math.random()*10000) % chars.length;
-   //   ans += chars[nextI];
-   //}
-   return ans;
-}
 
     return {
         unique: unique
@@ -136,7 +136,8 @@ function cloneMap(m /*: Object*/) /*: Object*/{
  * */
 function deepObjToJSON(obj /*:any*/,
                        idToWebkey /*: (id: Object) => string*/,
-                       saver /*: Saver*/) /*: any */ {
+                       saver /*: Saver*/) /*: any */
+{
     if (obj === undefined) {return null;}
     if (obj === null) {return null;}
     if (typeof obj === "function") {
@@ -156,6 +157,7 @@ function deepObjToJSON(obj /*:any*/,
     return clone;
 }
 
+
 /**
  * finding commands such as drop and make, if a command line has an arg
  * after "server" make the rest of the args elements in map
@@ -165,16 +167,19 @@ function deepObjToJSON(obj /*:any*/,
  * Converts args preceded with "@" to live refs
  * */
 function argMap(argv /*: Array<string>*/,
-                webkeyStringToLive /*: (webkey: string) => any */) /*: Object*/{
+                webkeyStringToLive /*: (webkey: string) => any */) /*: Object*/
+{
     var args = {};
     var serverIndex;
     for (serverIndex  = 0;
-        serverIndex < argv.length && argv[serverIndex].indexOf ("server") < 0;
-        serverIndex++) {}
+         serverIndex < argv.length && argv[serverIndex].indexOf ("server") < 0;
+         serverIndex++) {
+        // next arg...
+    }
     if (serverIndex === argv.length - 1) {return args;}
     var command = argv[serverIndex+1];
     var commandArgs /*: Array<string|number|Object>*/ = [];
-     argv.splice(serverIndex+2).forEach(function(next, i) {
+    argv.splice(serverIndex+2).forEach(function(next, i) {
         if (next.indexOf("#") === 0) {
             commandArgs[i] = parseFloat(next.substring(1));
         } else if (next.indexOf("@") === 0) {
@@ -188,44 +193,6 @@ function argMap(argv /*: Array<string>*/,
 }
 
 
-function makeFileUtils(fs /*:FSSync*/, path /*: Path*/) /*: FileUtils*/ {
-
-function copyFile(src, dest) {
-    var data = fs.readFileSync(src);
-    fs.writeFileSync(dest, data);
-}
-function copyRecurse(src /*: string*/, dest /*: string*/) /*: void*/{
-  var exists = fs.existsSync(src);
-  var isDirectory = exists ? fs.statSync(src).isDirectory() : null;
-  if (exists && isDirectory) {
-    fs.mkdirSync(dest);
-    fs.readdirSync(src).forEach(function(childItemName) {
-      copyRecurse(path.join(src, childItemName),
-                        path.join(dest, childItemName));
-    });
-  } else if (exists) {copyFile(src, dest);}
-}
-function makeNewServer() {
-    function copyIfAbsent(dest) {
-        var srcDir = path.dirname(module.filename);
-        if (!fs.existsSync(dest)) {
-            copyRecurse(path.join(srcDir, dest), dest);
-        }
-    }
-    copyIfAbsent("capper.db");
-    copyIfAbsent("capper.config");
-    copyIfAbsent("apps");
-    copyIfAbsent("test");
-    copyIfAbsent("views");
-    copyIfAbsent("ssl");
-}
-
-    return {
-        makeNewServer: makeNewServer,
-        copyRecurse: copyRecurse
-    };
-}
-
 var self = {
     typeCheck: typeCheck,
     makeUnique: makeUnique,
@@ -234,9 +201,7 @@ var self = {
     makeSealerPair: makeSealerPair,
     cloneMap: cloneMap,
     argMap:argMap,
-    deepObjToJSON: deepObjToJSON,
-    makeFileUtils: makeFileUtils
+    deepObjToJSON: deepObjToJSON
 };
-return self;
 
-}();
+module.exports = self;
