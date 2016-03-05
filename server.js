@@ -26,7 +26,7 @@ var log = function(text) {console.log(text);};
 
 
 function main(argv, require, crypto, fs, path, createServer, express) {
-    var unique = caplib.makeUnique(crypto).unique;
+    var unique = caplib.makeUnique(crypto.randomBytes);
     var reviver = makeReviver(require);
     const dbfile = fsSyncAccess(fs, path.join, "capper.db");
     var rd = p => fsReadAccess(fs, path.join, p);

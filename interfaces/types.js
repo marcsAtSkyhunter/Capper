@@ -42,8 +42,3 @@ type SealerPair<T> = {
   seal(x: T): any;
   unseal(boxy: any): T
 }
-
-type Unique = {
-  unique(): string
-}
-

@@ -50,8 +50,3 @@ type Stats = {
 }
 
 type ErrnoException = any;
-
-type Crypto = {
-  randomBytes(qty: number): Array<number>
-}
-

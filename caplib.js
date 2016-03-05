@@ -77,12 +77,13 @@ function tvalid(args /*:Array<any>*/, types /*: string*/, additionalTest /*:bool
     return valid(typeCheck(args, types) && additionalTest, errMsg);
 }
 
-function makeUnique(crypto /*: Crypto*/) /*: Unique*/{
+function makeUnique(randomBytes /*: (qty: number) => Array<number>*/
+                   ) /*: () => string*/{
 
     function unique() {
         var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
         var ans = "";
-        var buf = crypto.randomBytes(25);
+        var buf = randomBytes(25);
         for (var i = 0; i < buf.length; i++) {
             var index = buf[i] % chars.length;
             ans += chars[index];
@@ -94,9 +95,7 @@ function makeUnique(crypto /*: Crypto*/) /*: Unique*/{
         return ans;
     }
 
-    return {
-        unique: unique
-    };
+    return unique;
 }
 
 function makeSealerPair() /*: SealerPair*/{
