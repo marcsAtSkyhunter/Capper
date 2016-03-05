@@ -16,7 +16,7 @@ information regarding how to obtain the source code for this library.
  @flow
 */
 
-/*global require, module, console, process */
+/*global require, module, console, process, __dirname */
 /* eslint-env es6 */
 "use strict";
 var Q = require("q");
@@ -135,12 +135,16 @@ function makeReviver(require) /*: Reviver*/ {
         return maker;
     }
 
-    function sendUI(res, reviver) {
+    function sendUI(res, reviver, path /*: ?string*/) {
         var revstring = "./apps/";
-        var parts = reviver.split(".");
-        revstring = revstring + parts[0] + "/ui/";
-        var filename = parts.length > 1 ? parts[1] : "index";
-        revstring += filename + ".html";
+        if (path) {
+            revstring += "/ui" + path;
+        } else{
+            var parts = reviver.split(".");
+            revstring = revstring + parts[0] + "/ui/";
+            var filename = parts.length > 1 ? parts[1] : "index";
+            revstring += filename + ".html";
+        }
         res.sendfile(revstring);
     }
 
@@ -200,18 +204,19 @@ function makeApp(express, saver, sturdy, sendUI) {
     var webkeyToLive = sturdy.webkeyToLive;
     var vowAnsToVowJSONString = sturdy.vowAnsToVowJSONString;
 
+    const view = path => __dirname + "/views/" + path;
     var app = express();
     app.get("/views/:filename", function(req, res) {
-        res.sendfile("./views/" + req.params.filename);
+        res.sendfile(view(req.params.filename));
     });
     app.get("/views/:path1/:filename", function(req, res) {
-        res.sendfile("./views/" + req.params.path1 + "/" + req.params.filename);
+        res.sendfile(view(req.params.path1 + "/" + req.params.filename));
     });
     app.get("/apps/:theapp/ui/:filename", function(req, res) {
-        res.sendfile("./apps/" + req.params.theapp + "/ui/" + req.params.filename);
+        sendUI(res, req.params.theapp, req.params.filename);
     });
     app.get("/", function(req, res) {
-        res.sendfile("./views/index.html");
+        res.sendfile(view("index.html"));
     });
 
     function getObj(req) {
