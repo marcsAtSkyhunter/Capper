@@ -264,7 +264,7 @@ function makeApp(express, saver, sturdy, sendUI) {
         vowAnsToVowJSONString(vowAns).then(function(jsonString){
             log("returning: " + jsonString);
             res.send(jsonString);
-        });
+        }).done();
     }
     app.post("/ocaps/", parseBody, invokeActor);
 
@@ -298,7 +298,7 @@ function run(argv /*: Array<string>*/,
         if (!obj) {log("cannot find maker " + argMap["-make"]); return;}
         saver.checkpoint().then(function() {
             log(sturdy.idToWebkey(saver.asId(obj)));
-        });
+        }).done();
     } else if ("-post" in argMap) {
         var args = argMap["-post"];
         if (typeof args[0] !== "object") {
@@ -317,7 +317,7 @@ function run(argv /*: Array<string>*/,
         sslOptions(sslDir).then(sslOpts => {
             var s = createServer(sslOpts, app);
             s.listen(config.port);
-        });
+        }).done();
     }
 }
 
