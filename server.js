@@ -39,6 +39,8 @@ function main(argv, require, crypto, fs, path, createServer, express) {
 }
 
 var exports = module.exports;
+exports.caplib = caplib;
+
 exports.fsReadAccess = fsReadAccess;
 function fsReadAccess(fs /*: FileSystem */,
                       join /*:(...parts: Array<string>) => string*/,
