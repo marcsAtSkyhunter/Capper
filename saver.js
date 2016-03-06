@@ -16,8 +16,8 @@ information regarding how to obtain the source code for this library.
 @flow
 */
 
-/*global require, Map, console, Proxy, setImmediate */
-/* eslint-env node */
+/*global require, Map, console, Proxy, setImmediate, __dirname */
+/* eslint-env es6, node */
 "use strict";
 var Q = require("q");
 var caplib = require("./caplib");
@@ -332,4 +332,85 @@ function makeSaver(unique /*: () => string*/,
         drop: drop
     };
     return Object.freeze(self);
+}
+
+
+exports.makeReviver = makeReviver;
+function makeReviver(require /*: (mod: string) => any*/) /*: Reviver*/ {
+    function toMaker(reviver) {
+        var parts = reviver.split(".");
+        var path = __dirname + "/apps/" + parts[0] +"/server/main.js";
+        var maker = require(path);
+        if (parts.length === 2) {maker = maker[parts[1]];}
+        return maker;
+    }
+
+    function sendUI(res, reviver, path /*: ?string*/) {
+        var revstring = "./apps/";
+        if (path) {
+            revstring += "/ui" + path;
+        } else{
+            var parts = reviver.split(".");
+            revstring = revstring + parts[0] + "/ui/";
+            var filename = parts.length > 1 ? parts[1] : "index";
+            revstring += filename + ".html";
+        }
+        res.sendfile(revstring);
+    }
+
+    return Object.freeze({
+        toMaker: toMaker,
+        sendUI: sendUI
+    });
+}
+
+exports.ezSaver = ezSaver;
+function ezSaver(require /*: (name: string) => any*/
+                ) /*: { reviver: Reviver, saver: Saver }*/{
+    var unique = caplib.makeUnique(require("crypto").randomBytes);
+    var reviver = makeReviver(require);
+    const dbfile = fsSyncAccess(require("fs"),
+                                require("path").join,
+                                "capper.db");
+    return Object.freeze({
+        reviver: reviver,
+        saver: makeSaver(unique, dbfile, reviver.toMaker)
+    });
+}
+
+exports.fsReadAccess = fsReadAccess;
+function fsReadAccess(fs /*: FileSystem */,
+                      join /*:(...parts: Array<string>) => string*/,
+                      path /*: string*/) /*: ReadAccess*/ {
+    return Object.freeze({
+        readText: (encoding /*: string*/) =>
+            Q.nfcall(fs.readFile, path, encoding),
+        readBytes: () =>
+            Q.nfcall(fs.readFile, path),
+        subRd: (other) => fsReadAccess(fs, join, join(path, other))
+    });
+}
+
+exports.fsWriteAccess = fsWriteAccess;
+function fsWriteAccess(fs /*: FileSystem */,
+                       join /*:(...parts: Array<string>) => string*/,
+                       path /*: string*/) /*: WriteAccess*/ {
+    return Object.freeze({
+        writeText: (text) =>
+            Q.nfcall(fs.writeFile, path, text),
+        subWr: (other) => fsWriteAccess(fs, join, join(path, other)),
+        ro: () => fsReadAccess(fs, join, path)
+    });
+}
+
+exports.fsSyncAccess = fsSyncAccess;
+function fsSyncAccess(fs /*: FileSystem */,
+                      join /*:(...parts: Array<string>) => string*/,
+                      path /*: string*/) /*: SyncAccess*/ {
+    return Object.freeze({
+        existsSync: () => fs.existsSync(path),
+        readTextSync: (encoding) => fs.readFileSync(path, encoding),
+        writeSync: (contents) => fs.writeFileSync(path, contents),
+        unsync: () => fsWriteAccess(fs, join, path)
+    });
 }

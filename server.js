@@ -21,62 +21,24 @@ information regarding how to obtain the source code for this library.
 "use strict";
 var Q = require("q");
 var caplib = require("./caplib");
-var makeSaver = require("./saver").makeSaver;
+var ezSaver = require("./saver").ezSaver;
+var io = require("./saver");
 var log = function(text) {console.log(text);};
 
 
 function main(argv, require, crypto, fs, path, createServer, express) {
-    var unique = caplib.makeUnique(crypto.randomBytes);
-    var reviver = makeReviver(require);
-    const dbfile = fsSyncAccess(fs, path.join, "capper.db");
-    var rd = p => fsReadAccess(fs, path.join, p);
+    var sr = ezSaver(require);
+    var rd = p => io.fsReadAccess(fs, path.join, p);
     var sslDir = rd("./ssl");
 
     makeConfig(rd("capper.config")).then(config => {
-        run(argv, config, reviver, unique, sslDir, dbfile,
+        run(argv, config, sr.reviver, sr.saver, sslDir,
             createServer, express);
     });
 }
 
 var exports = module.exports;
 exports.caplib = caplib;
-
-exports.fsReadAccess = fsReadAccess;
-function fsReadAccess(fs /*: FileSystem */,
-                      join /*:(...parts: Array<string>) => string*/,
-                      path /*: string*/) /*: ReadAccess*/ {
-    return Object.freeze({
-        readText: (encoding /*: string*/) =>
-            Q.nfcall(fs.readFile, path, encoding),
-        readBytes: () =>
-            Q.nfcall(fs.readFile, path),
-        subRd: (other) => fsReadAccess(fs, join, join(path, other))
-    });
-}
-
-exports.fsWriteAccess = fsWriteAccess;
-function fsWriteAccess(fs /*: FileSystem */,
-                       join /*:(...parts: Array<string>) => string*/,
-                       path /*: string*/) /*: WriteAccess*/ {
-    return Object.freeze({
-        writeText: (text) =>
-            Q.nfcall(fs.writeFile, path, text),
-        subWr: (other) => fsWriteAccess(fs, join, join(path, other)),
-        ro: () => fsReadAccess(fs, join, path)
-    });
-}
-
-exports.fsSyncAccess = fsSyncAccess;
-function fsSyncAccess(fs /*: FileSystem */,
-                      join /*:(...parts: Array<string>) => string*/,
-                      path /*: string*/) /*: SyncAccess*/ {
-    return Object.freeze({
-        existsSync: () => fs.existsSync(path),
-        readTextSync: (encoding) => fs.readFileSync(path, encoding),
-        writeSync: (contents) => fs.writeFileSync(path, contents),
-        unsync: () => fsWriteAccess(fs, join, path)
-    });
-}
 
 /*::
 type Config = {
@@ -124,36 +86,6 @@ function parseBody(req, res, next) {
         next();
     });
 }
-
-
-function makeReviver(require) /*: Reviver*/ {
-    function toMaker(reviver) {
-        var parts = reviver.split(".");
-        var path = "./apps/" + parts[0] +"/server/main.js";
-        var maker = require(path);
-        if (parts.length === 2) {maker = maker[parts[1]];}
-        return maker;
-    }
-
-    function sendUI(res, reviver, path /*: ?string*/) {
-        var revstring = "./apps/";
-        if (path) {
-            revstring += "/ui" + path;
-        } else{
-            var parts = reviver.split(".");
-            revstring = revstring + parts[0] + "/ui/";
-            var filename = parts.length > 1 ? parts[1] : "index";
-            revstring += filename + ".html";
-        }
-        res.sendfile(revstring);
-    }
-
-    return Object.freeze({
-        toMaker: toMaker,
-        sendUI: sendUI
-    });
-}
-
 
 
 function makeSturdy(saver, domain) {
@@ -286,12 +218,10 @@ exports.run = run;
 function run(argv /*: Array<string>*/,
              config /*: Config*/,
              reviver /*: Reviver*/,
-             unique /*: () => string*/,
+             saver /*: Saver*/,
              sslDir /*: ReadAccess*/,
-             dbfile /*: SyncAccess*/,
              createServer /*: typeof https.createServer */,
              express /*: () => Application */) {
-    const saver = makeSaver(unique, dbfile, reviver.toMaker);
     const sturdy = makeSturdy(saver, config.domain);
 
     var argMap = caplib.argMap(argv, sturdy.wkeyStringToLive);
