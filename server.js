@@ -21,18 +21,21 @@ information regarding how to obtain the source code for this library.
 "use strict";
 var Q = require("q");
 var caplib = require("./caplib");
-var ezSaver = require("./saver").ezSaver;
+var makeReviver = require("./saver").makeReviver;
+var makeSaver = require("./saver").makeSaver;
 var io = require("./saver");
 var log = function(text) {console.log(text);};
 
 
 function main(argv, require, crypto, fs, path, createServer, express) {
-    var sr = ezSaver(require);
-    var rd = p => io.fsReadAccess(fs, path.join, p);
-    var sslDir = rd("./ssl");
+    const rd = p => io.fsReadAccess(fs, path.join, p);
+    const unique = caplib.makeUnique(crypto.randomBytes);
+    const dbfile = io.fsSyncAccess(fs, path.join, "capper.db");
+    const reviver = makeReviver(require);
+    const saver = makeSaver(unique, dbfile, reviver.toMaker)
 
     makeConfig(rd("capper.config")).then(config => {
-        run(argv, config, sr.reviver, sr.saver, sslDir,
+        run(argv, config, reviver, saver, rd("./ssl"),
             createServer, express);
     });
 }
