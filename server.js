@@ -174,7 +174,7 @@ function makeApp(express, saver, sturdy, sendUI) {
 
     function showActor(req, res) {
         if (!req.query.s ) {
-            res.sendfile("./bootstrap.html");
+            res.sendfile(__dirname + "/bootstrap.html");
         } else {
             try {
                 var objdata = getObj(req);
