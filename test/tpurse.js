@@ -1,7 +1,7 @@
 /*global require describe it console */
 "use strict";
 var assert = require("assert");
-var saver = require("../saver");
+var saver = require("../saver").ezSaver(require).saver;
 describe ("purse", function() {
     it("withdraw&deposit ", function() {
         var shared = saver.make("shared");

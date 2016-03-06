@@ -1,6 +1,6 @@
 /*global require, describe, it, console */
 var assert = require("assert");
-var saver = require("../saver");
+var saver = require("../saver").ezSaver(require).saver;
 describe ("hello", function() {
     "use strict";
     it("setGetGreeting ", function() {

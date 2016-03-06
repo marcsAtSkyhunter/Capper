@@ -2,6 +2,7 @@
 "use strict";
 
 var caplib = require("../../../caplib");
+var unique = caplib.makeUnique(require("crypto").randomBytes);
 module.exports = Object.freeze({
     makeSealerPair: function(context) {
         return Object.freeze({

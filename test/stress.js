@@ -1,6 +1,6 @@
 /*global require, describe, it, console */
 var assert = require("assert");
-var saver = require("../saver");
+var saver = require("../saver").ezSaver(require).saver;
 var Q = require("q");
 describe ("checkpoint sequentiality", function() {
     "use strict";
