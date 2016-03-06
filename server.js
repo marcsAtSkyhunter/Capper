@@ -145,14 +145,11 @@ function makeApp(express, saver, sturdy, sendUI) {
 
     const view = path => __dirname + "/views/" + path;
     var app = express();
-    app.get("/views/:filename", function(req, res) {
-        res.sendfile(view(req.params.filename));
+    app.get("/views/*", function(req, res) {
+        res.sendfile(view(req.params[0]));
     });
-    app.get("/views/:path1/:filename", function(req, res) {
-        res.sendfile(view(req.params.path1 + "/" + req.params.filename));
-    });
-    app.get("/apps/:theapp/ui/:filename", function(req, res) {
-        sendUI(res, req.params.theapp, req.params.filename);
+    app.get("/apps/:theapp/ui/*", function(req, res) {
+        sendUI(res, req.params.theapp, req.params[0]);
     });
     app.get("/", function(req, res) {
         res.sendfile(view("index.html"));
