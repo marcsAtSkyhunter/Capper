@@ -42,6 +42,10 @@ function main(argv, require, crypto, fs, path, createServer, express) {
 
 var exports = module.exports;
 exports.caplib = caplib;
+exports.makeSaver = makeSaver;
+exports.fsSyncAccess = io.fsSyncAccess;
+exports.fsWriteAccess = io.fsWriteAccess;
+exports.fsReadAccess = io.fsReadAccess;
 
 /*::
 type Config = {
