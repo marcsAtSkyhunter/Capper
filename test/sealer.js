@@ -3,7 +3,7 @@
 var assert = require("assert");
 var saver = require("../saver");
 describe ("sealer", function() {
-    it("seal&unseal ", function() {        
+    it("seal&unseal ", function() {
         var shared = saver.make("shared");
         var sealer = saver.make("sealer.makeSealer", shared);
         var unsealer = saver.make("sealer.makeUnsealer", shared);

@@ -3,7 +3,7 @@ var caplib = require("../caplib");
 describe ("caplib", function() {
     it("should return not equal for 3 and 4", function() {
         assert(3!==4);
-    }); 
+    });
     it("unique should return 25 char distinct tokens ", function() {
         var t1 = caplib.unique();
         var t2 = caplib.unique();

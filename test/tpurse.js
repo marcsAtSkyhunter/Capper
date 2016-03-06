@@ -3,7 +3,7 @@
 var assert = require("assert");
 var saver = require("../saver");
 describe ("purse", function() {
-    it("withdraw&deposit ", function() {        
+    it("withdraw&deposit ", function() {
         var shared = saver.make("shared");
         var shareId = saver.asId(shared);
         var rootPurse = saver.make("money.makePurse", shared, 200000);
@@ -14,7 +14,7 @@ describe ("purse", function() {
         assert(smallPurse.balance() === 30 && rootPurse.balance() === 200000-30,
             "post withdraw balances");
         var amount = rootPurse.deposit(smallPurse);
-        assert(amount === 30 && rootPurse.balance() === 200000 && 
+        assert(amount === 30 && rootPurse.balance() === 200000 &&
             smallPurse.balance() ===0,
             "post deposit balances");
         saver.drop(shareId);
