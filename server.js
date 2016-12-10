@@ -216,6 +216,7 @@ function makeApp(express, saver, sturdy, sendUI) {
 /*::
 // only import the types, not the ambient authority.
 const https = require("https");
+const http = require("http");
  */
 
 exports.run = run;
@@ -258,6 +259,18 @@ function run(argv /*: Array<string>*/,
             s.listen(config.port);
         }).done();
     }
+}
+
+exports.runNaked = runNaked;
+function runNaked(config /*: Config*/,
+                  reviver /*: Reviver*/,
+                  saver /*: Saver*/,
+                  createServer /*: typeof http.createServer */,
+                  express /*: () => Application */) {
+    const sturdy = makeSturdy(saver, config.domain);
+    const app = makeApp(express, saver, sturdy, reviver.sendUI);
+    var s = createServer(app);
+    s.listen(config.port);
 }
 
 
