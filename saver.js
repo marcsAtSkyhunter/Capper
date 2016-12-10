@@ -188,7 +188,7 @@ function makeSaver(unique /*: () => string*/,
             }
             return thing;
         }
-        var p = Proxy.create({
+        var p = new Proxy({}, {
             //TODO unwind gotten objects to replace ids with persistent objs
             get: function(proxy, key) {
                 var ans = convertForExport(data[key]);
