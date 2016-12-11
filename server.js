@@ -24,7 +24,6 @@ var caplib = require("./caplib");
 var makeReviver = require("./saver").makeReviver;
 var makeSaver = require("./saver").makeSaver;
 var io = require("./saver");
-var log = function(text) {console.log(text);};
 
 
 function main(argv, require, crypto, fs, path, createServer, express) {
@@ -59,9 +58,9 @@ function makeConfig(rd /*: ReadAccess */) /*: Promise<Config>*/ {
         var config = JSON.parse(data);
         var port = config.port;
         var domain = config.protocol + "://" + config.domain + ":" + config.port + "/";
-        log("config domain " + domain);
+        console.log("config domain " + domain);
         return {domain: domain, port: port};
-    }).catch(err => {log("bad capper.config file" + err); throw(err);});
+    }).catch(err => {console.error("bad capper.config file", err); throw(new Error(err));});
 }
 
 function sslOptions(files /*: ReadAccess */) {
@@ -100,12 +99,12 @@ function makeSturdy(saver, domain) {
     function vowAnsToVowJSONString(vowAns) {
         return vowAns.then(function(ans) {
             var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
-            log(JSON.stringify(result));
+            console.log(result);
             if (result !== null && typeof result === "object" && ("@" in result)) {
                 return JSON.stringify(result);
             } else {return JSON.stringify({"=": result});}
         }, function(err){
-            log("vowAnsToVowJSONString err " + err);
+            console.error("vowAnsToVowJSONString err ", err);
             return JSON.stringify({"!": err});
         });
     }
@@ -117,7 +116,7 @@ function makeSturdy(saver, domain) {
         try {
             if (wkeyObj["@"]) {
                 var cred = wkeyObj["@"].split("#s=")[1];
-                //log("wkeyObj is webkey, cred is " + cred);
+                //console.log("wkeyObj is webkey, cred is " + cred);
                 return saver.live(saver.credToId(cred));
             } else {return wkeyObj;}
         } catch (err) {return wkeyObj;}
@@ -177,11 +176,11 @@ function makeApp(express, saver, sturdy, sendUI) {
                 var objdata = getObj(req);
                 if (!objdata.live) {res.send("no such object");}
                 //res.setHeader("Content-Security-Policy", "default-src: 'self'");
-                //log("set CSP header");
+                //console.log("set CSP header");
                 //res.writeHead(200)
                 sendUI(res, objdata.reviver);
             } catch (err) {
-                console.log('showActor not found:', err);
+                console.error('showActor not found:', err);
                 res.send("Object not Found");
                 //res.close();
             }
@@ -190,12 +189,12 @@ function makeApp(express, saver, sturdy, sendUI) {
     app.get("/ocaps/", showActor);
 
     function invokeActor(req, res){
-        log("post query " + JSON.stringify(req.query));
-        log("post body: " + JSON.stringify(req.body));
+        console.log("post query ", req.query);
+        console.log("post body: ", req.body);
         var objdata = getObj(req);
         if (!objdata.live) {
             res.send(JSON.stringify({"!": "bad object invoked"}));
-            log("bad object invoked: " + JSON.stringify(req.query));
+            console.error("bad object invoked: ", req.query);
             return;
         }
         var args = req.body; //body already parsed
@@ -203,7 +202,7 @@ function makeApp(express, saver, sturdy, sendUI) {
         args.forEach(function(next) {translatedArgs.push(webkeyToLive(next));});
         var vowAns = saver.deliver.apply(null, translatedArgs);
         vowAnsToVowJSONString(vowAns).then(function(jsonString){
-            log("returning: " + jsonString);
+            console.log("returning: ", jsonString);
             res.send(jsonString);
         }).done();
     }
@@ -235,21 +234,21 @@ function run(argv /*: Array<string>*/,
         saver.checkpoint().then(function() {console.log("drop done");});
     } else if ("-make" in argMap){
         var obj = saver.make.apply(undefined, argMap["-make"]);
-        if (!obj) {log("cannot find maker " + argMap["-make"]); return;}
+        if (!obj) {console.error("cannot find maker " + argMap["-make"]); return;}
         saver.checkpoint().then(function() {
-            log(sturdy.idToWebkey(saver.asId(obj)));
+            console.log(sturdy.idToWebkey(saver.asId(obj)));
         }).done();
     } else if ("-post" in argMap) {
         var args = argMap["-post"];
         if (typeof args[0] !== "object") {
-            log("bad target object webkey; forget '@'?");
+            console.error("bad target object webkey; forget '@'?");
         } else if (typeof args[1] !== "string") {
-            log("method to invoke is not a string");
+            console.error("method to invoke is not a string");
         } else {
             args[0] = saver.asId(args[0]);
             var vowAns = saver.deliver.apply(undefined, args);
             sturdy.vowAnsToVowJSONString(vowAns).then(function(answer){
-                log(answer);
+                console.log(answer);
             });
         }
     } else {
