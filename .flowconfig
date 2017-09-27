@@ -1,0 +1,7 @@
+[libs]
+interfaces/
+
+[ignore]
+.*node_modules/.*/test/.*\.json
+.*node_modules/.*/tables/.*\.json
+.*node_modules/resolve/lib/.*\.json
