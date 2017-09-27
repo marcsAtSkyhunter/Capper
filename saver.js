@@ -220,7 +220,7 @@ function makeSaver(unique /*: () => string*/,
                 } else {data[key] = val;}
                 return true;
             },
-            has: function(name) {return name in data;}
+            has: function(name /*: string */) {return name in data;}
             //delete, iterate, keys
         });
         return p;

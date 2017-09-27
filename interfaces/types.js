@@ -3,17 +3,19 @@ type Reviver = {
     sendUI(res: Response, reviver: string): void;
 };
 
+type Id = {id: string}
+
 type Saver = {
-    deliver(id: Object, method: string, ...optArgs: Array<any>): Promise<any>;
+    deliver(id: Id, method: string, ...optArgs: Array<any>): Promise<any>;
     make(makerLocation: string, optInitArgs: ?Array<any>): Object;
-    reviver(id: Object): string;
+    reviver(id: Id): string;
     hasId(ref: any): bool;
     asId(ref: any): Object;
-    idToCred(id: Object): string;
-    credToId(cred: string): Object;
-    live(id: Object): any;
+    idToCred(id: Id): string;
+    credToId(cred: string): Id;
+    live(id: Id): any;
     checkpoint(): Promise<bool>,
-    drop(id: Object): void;
+    drop(id: Id): void;
 };
 
 

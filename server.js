@@ -94,9 +94,10 @@ function parseBody(req, res, next) {
 }
 
 
-function makeSturdy(saver, domain) {
+exports.makeSturdy = makeSturdy;
+function makeSturdy(saver /*: Saver*/, domain /*: string*/) {
 
-    function vowAnsToVowJSONString(vowAns) {
+    function vowAnsToVowJSONString(vowAns /*: Promise<Object> */) {
         return vowAns.then(function(ans) {
             var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
             console.log(result);
@@ -112,7 +113,7 @@ function makeSturdy(saver, domain) {
      * webkeyToLive(wkeyObj) looks to see if the arg is a webkeyObject, if so,
      * returns a live ref, otherwise returns the arg unchanged
      */
-    function webkeyToLive(wkeyObj) {
+    function webkeyToLive(wkeyObj /*: any*/) {
         try {
             if (wkeyObj["@"]) {
                 var cred = wkeyObj["@"].split("#s=")[1];
@@ -121,11 +122,11 @@ function makeSturdy(saver, domain) {
             } else {return wkeyObj;}
         } catch (err) {return wkeyObj;}
     }
-    function idToWebkey(id) {
+    function idToWebkey(id /*: Object*/) {
         return domain + "ocaps/#s=" + saver.idToCred(id);
     }
 
-    function wkeyStringToLive(keyString) {
+    function wkeyStringToLive(keyString /*: string*/) {
         return webkeyToLive({"@": keyString});
     }
 

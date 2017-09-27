@@ -176,19 +176,27 @@ function argMap(argv /*: Array<string>*/,
         // next arg...
     }
     if (serverIndex === argv.length - 1) {return args;}
+    var parseArg = makeParseArg(webkeyStringToLive);
     var command = argv[serverIndex+1];
     var commandArgs /*: Array<string|number|Object>*/ = [];
     argv.splice(serverIndex+2).forEach(function(next, i) {
-        if (next.indexOf("#") === 0) {
-            commandArgs[i] = parseFloat(next.substring(1));
-        } else if (next.indexOf("@") === 0) {
-            commandArgs[i] = webkeyStringToLive(next.substring(1));
-        } else {
-            commandArgs[i] = next;
-        }
+        commandArgs[i] = parseArg(next);
     });
     args[command] = commandArgs;
     return args;
+}
+
+function makeParseArg(webkeyStringToLive /*: (webkey: string) => any */) /*: (string) => any */{
+    return parseArg;
+
+    function parseArg(next /*: string*/) {
+        if (next.indexOf("#") === 0) {
+            return parseFloat(next.substring(1));
+        } else if (next.indexOf("@") === 0) {
+            return webkeyStringToLive(next.substring(1));
+        }
+        return next;
+    }
 }
 
 
@@ -199,7 +207,8 @@ var self = {
     tvalid: tvalid,
     makeSealerPair: makeSealerPair,
     cloneMap: cloneMap,
-    argMap:argMap,
+    argMap: argMap,
+    makeParseArg: makeParseArg,
     deepObjToJSON: deepObjToJSON
 };
 
