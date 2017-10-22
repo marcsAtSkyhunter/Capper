@@ -1,12 +1,13 @@
 var assert = require("assert");
 var caplib = require("../caplib");
+var unique = caplib.makeUnique(require("crypto").randomBytes);
 describe ("caplib", function() {
     it("should return not equal for 3 and 4", function() {
         assert(3!==4);
-    }); 
+    });
     it("unique should return 25 char distinct tokens ", function() {
-        var t1 = caplib.unique();
-        var t2 = caplib.unique();
+        var t1 = unique();
+        var t2 = unique();
         assert(t1.length == 25, "not 25 char long");
         assert(t2 !== t1, "not matching uniques");
     });
