@@ -1,9 +1,11 @@
+import type Promise from 'q';
+
 type Reviver = {
     toMaker(reviver: string): any,
-    sendUI(res: Response, reviver: string): void;
+    sendUI(res: Response, reviver: string, method: ?string): void;
 };
 
-type Id = {id: string}
+type Id = {"@id": string}
 
 type Saver = {
     deliver(id: Id, method: string, ...optArgs: Array<any>): Promise<any>;
@@ -42,5 +44,5 @@ type SyncAccess = {
 
 type SealerPair<T> = {
   seal(x: T): any;
-  unseal(boxy: any): T
+  unseal(boxy: any): ?T
 }

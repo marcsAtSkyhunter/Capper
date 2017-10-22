@@ -20,6 +20,7 @@ information regarding how to obtain the source code for this library.
 /* eslint-env es6 */
 "use strict";
 var Q = require("q");
+/*:: import type Promise from 'q'; */
 var caplib = require("./caplib");
 var makeReviver = require("./saver").makeReviver;
 var makeSaver = require("./saver").makeSaver;
@@ -97,7 +98,7 @@ function parseBody(req, res, next) {
 exports.makeSturdy = makeSturdy;
 function makeSturdy(saver /*: Saver*/, domain /*: string*/) {
 
-    function vowAnsToVowJSONString(vowAns /*: Promise<Object> */) {
+    function vowAnsToVowJSONString(vowAns /*: Promise<Object> */) /*: Promise<string> */{
         return vowAns.then(function(ans) {
             var result = caplib.deepObjToJSON(ans, idToWebkey, saver);
             console.log(result);

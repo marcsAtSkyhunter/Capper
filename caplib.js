@@ -98,13 +98,13 @@ function makeUnique(randomBytes /*: (qty: number) => Array<number>*/
     return unique;
 }
 
-function makeSealerPair() /*: SealerPair*/{
-    var holder = null;
-    function seal(x) {
+function makeSealerPair/*::<T>*/() /*: SealerPair<T> */{
+    var holder /*:?T*/ = null;
+    function seal(x /*:T*/) {
         var box = function() {holder = x;};
         return box;
     }
-    function unseal(box) {
+    function unseal(box) /*:?T*/ {
         holder = null;
         box();
         var ans = holder;

@@ -71,8 +71,8 @@ function makeSaver(unique /*: () => string*/,
         }
     }
 
-    function credToId(cred) {return Object.freeze({"@id": cred });}
-    function idToCred(id) {return id["@id"];}
+    function credToId(cred) /*: Id*/ {return Object.freeze({"@id": cred });}
+    function idToCred(id /*: Id*/) {return id["@id"];}
 
     /**
      * systate keys are the credentials from the webkeys, i.e., from the "ids".
