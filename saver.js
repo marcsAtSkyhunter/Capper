@@ -190,14 +190,14 @@ function makeSaver(unique /*: () => string*/,
         }
         var p = new Proxy({}, {
             //TODO unwind gotten objects to replace ids with persistent objs
-            get: function(proxy, key) {
+            get: function(proxy, key, rx) {
                 var ans = convertForExport(data[key]);
                 if (ans && typeof ans === "object" && !hasId(ans)) {
                     modifiedObjs[cred] = null;
                 }
                 return ans;
             },
-            set: function(proxy, key, val) {
+            set: function(proxy, key, val, rx) {
                 setupCheckpoint();
                 modifiedObjs[cred] = null;
                 data[key] = val;
@@ -220,7 +220,7 @@ function makeSaver(unique /*: () => string*/,
                 } else {data[key] = val;}
                 return true;
             },
-            has: function(name /*: string */) {return name in data;}
+            has: function(target, name /*: string */) {return name in data;}
             //delete, iterate, keys
         });
         return p;
