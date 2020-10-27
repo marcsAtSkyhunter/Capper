@@ -1,4 +1,5 @@
-###Capper
+### Capper
+
 Capper is a web application framework built on Node.js/[Express](https://github.com/visionmedia/express) (with [Q.js for promises](https://github.com/kriskowal/q)) that implements security using [webkeys](http://waterken.sourceforge.net/web-key/), i.e., unguessable, self-authorizing urls. Persistence of remotely-accessible objects is automated, and a webkey is associated with each such persistent exportable object at creation.
 
 By using webkeys for access control, Capper makes it quick and easy to build applications for which people do not need usernames or passwords: they just bookmark the link to the object they are allowed to use, and to access the object they just click the link and go to work. As explained in the [YouTube video "Webkeys versus Passwords"](https://www.youtube.com/watch?v=C7Pt9PGs4C4), it can be reasonably argued that such webkey based access control is at least as secure as using passwords. 
@@ -6,7 +7,8 @@ By using webkeys for access control, Capper makes it quick and easy to build app
 Webkeys also make it easier to enable [rich sharing](http://www.hpl.hp.com/techreports/2009/HPL-2009-169.pdf) wherein each participant in the handling of a resource gets as much authority as he needs and no more. See the [video on Rich Sharing](https://www.youtube.com/watch?v=T92ZboMsH1w) to learn about key features of rich sharing that are common in the physical world but very rare on the web. And the [2Click Sharing video](https://www.youtube.com/watch?v=cJThfgXMBA4) briefly shows a whole online desktop system entirely built with webkeys that enables such rich sharing.
 
 Capper uses the same webkey protocol that the [Waterken](http://waterken.sourceforge.net/) Java-based platform uses for browser/server communication. This protocol was scrutinized as part of a week long security review of the Waterken server and was found to be sound.
-####Capper First Steps
+
+#### Capper First Steps
 
 Install [node.js](http://nodejs.org). WARNING: If, rather than installing a shiny new nodejs, you are using an older version of nodejs, you may need to use the "--harmony" option on the command lines below rather than "--harmony-proxies", and "npm test" and "npm start" will not work correctly.
 
@@ -39,7 +41,8 @@ Now in the browser go to page
 
 Use a Chrome or Firefox browser for the following examples. To keep the example code short and easy to read, we have not put in the litany of switches needed to handle browser differences, and have not depended on an additional library (like JQuery) to hide the differences (though for a production system, you probably should choose a tool that hides the differences). Some of the examples may work with later versions of IE, but this is not guaranteed. 
 
-####Create A New HelloWorld Service
+#### Create A New HelloWorld Service
+
 To create a private hello world page, accessible only by you, shut down the server and type the command
 >node --harmony-proxies server -make hello
 
@@ -51,7 +54,8 @@ The part after the "#s=" is the cryptographically strong and unguessable credent
 You can destroy a service with the "drop" command using the credential. For the example service above, you would destroy it by shutting down the server and executing
 >node --harmony-proxies server -drop Vs6Q6ofuVL_DzzqoYe8cEuO
 
-####Create Your Own HelloGalaxy Service
+#### Create Your Own HelloGalaxy Service
+
 Now we will start developing code. Capper allows you to put many applications on a single server, each application having many different kinds of objects/services. Each application is given its own folder in the Capper/apps directory. Each app has a server subfolder, and a ui subfolder. The server subfolder always has a file main.js; the ui folder usually has a file index.html.
 
 For the HelloGalaxy application, create the file Capper/apps/helloGalaxy/server/main.js. Edit main.js to hold the following code:
@@ -102,7 +106,7 @@ This version of the page will not even invoke our object to see what the greetin
 
 Please note the meta/referrer/never tag in our page. You should always include this header when using webkeys. While the webkeys used by Capper, which place the credential in the fragment, are generally safe from being revealed via the referer header in most browsers, it is safer to explicitly request that the referer header be shut off.
 
-####Using Client-Side CapperConnect to Invoke Server-Side Methods
+#### Using Client-Side CapperConnect to Invoke Server-Side Methods
 
 To actually invoke our server-side object with the "greet" method, get back the answer, and use it to display the actual Hello Galaxy greeting in our page, we need to communicate with our server from the browser. capperConnect.js is a simple wrapper library for webkey protocol that allows us to directly make remote object method invocations (rather than fiddling ourselves with xhr requests and protocol). capperConnect.js is included in the distribution under Capper/views/libs.
 
@@ -139,7 +143,7 @@ After the window loads, the javascript will use CapperConnect to retrieve the ac
 
 CapperConnect.home is a client-side proxy for the server-side object being presented in the page. It has the method "post", which is given a method name ("greet" in this case) and a series of arguments as appropriate for the method invoked. Posting via the proxy returns a promise (a Q.js promise) for the answer; when the promise is fulfilled, it fires the "then" method that invokes the function with the answer (if something goes wrong, and the promise gets rejected, the second function fires with the error as the argument).
 
-####Enable Initialization and Greeting Update
+#### Enable Initialization and Greeting Update
 As our last step in this quick introduction, we will enable HelloGalaxy services to be initialized with a greeting during construction, and further allow the greeting to be modified after creation.
 
 Let us enhance the HelloGalaxy service (in Capper/apps/HelloGalaxy/server/main.js, as you hopefully recall) with an initialization method and a setter method:
@@ -171,7 +175,7 @@ Let's see the init method in action by creating another HelloGalaxy service:
 
 The webkey returned by this command should show a service with an already-initialized greeting.
 
-####Mocha Testing HelloGalaxy
+#### Mocha Testing HelloGalaxy
 
 The back end of the Capper server is "saver.js", which manages the objects and their persistence. You can run mocha tests of your objects by directly using the interface to the saver. To create a simple test of our simple helloGalaxy object, go into Capper/test and create the helloGalaxy.js file. The test code looks like:
 
@@ -195,7 +199,7 @@ Run the test by going into the main Capper directory and running mocha:
 
 Our test creates a new helloGalaxy service with saver.make, sets the greeting, and asserts that the greeting retrieved from the service is in fact the greeting that we set. At the end of the testing, we drop the service to avoid having it become a permanent part of our database. The saver.drop method requires the internal persistent id of the object, not a live reference to the object, so we retrieve that with saver.asId(object).
 
-####Setting Greeting from the Browser
+#### Setting Greeting from the Browser
 As we come to the end of this introduction, we will not show all the code for an upgraded user interface (a larger index.html file with a field for creating a new greeting, and a SetGreeting button for posting it to the server, and a larger hello.js file to go with it), but let us look at the critical additional javascript function in the ui. The additional function on the browser side is setGreeting:
 
 ```javascript
